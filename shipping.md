@@ -104,6 +104,13 @@ If `netlify login` fails, use the **dashboard** method in §2.1.
   ```
 - After deploy, build logs should show the real **`npm ci` / `vite build`**, not a bogus command. See [gotchas.md](gotchas.md) § Netlify for symptoms (404 despite “success”, **0 new functions** when SSR should upload).
 - **Local `vite dev`:** add **`web/netlify.toml`** from [templates/web-netlify.toml](templates/web-netlify.toml) so `@netlify/vite-plugin` does not resolve **`web/web`** when `repositoryRoot` is **`web/`** (see gotchas § Netlify).
+- **Local SSR smoke test (run before every push):** Vite build success does **not** mean the Netlify function will start. Always run:
+  ```bash
+  cd web && npm run build && \
+    node -e "import('./.netlify/v1/functions/server.mjs').then(() => console.log('SSR import OK')).catch(e => { console.error(e); process.exit(1) })"
+  ```
+  If you see `Cannot use import statement outside a module` or `ERR_REQUIRE_ESM`, follow [gotchas.md](gotchas.md) § *Netlify SSR function crashes on first request* — copy the package name from the stack trace into **`ssr.noExternal`** in `web/vite.config.ts` (see [templates/vite-ssr-noexternal.example.ts](templates/vite-ssr-noexternal.example.ts)) and rerun. The list is **per-site**; do not paste another project's deps.
+- **After deploy, hit the live URL once.** A green Netlify build only validates the bundler step, not the function. The first request is the real test.
 
 ---
 
@@ -127,5 +134,6 @@ Local build OK → git commit → GitHub repo (MCP or gh or manual) → push
 | Build command shows `netlify.toml` or other junk | Clear **Build command** in UI so repo `netlify.toml` applies |
 | 404 after “successful” deploy, `0` new functions | Use `[build] base = "web"` in `netlify.toml`; avoid `--prefix`-only builds (see [gotchas.md](gotchas.md) § Netlify) |
 | `vite dev` error: Base directory `…/web/web` does not exist | Add **`web/netlify.toml`** from [templates/web-netlify.toml](templates/web-netlify.toml) |
+| Netlify function crash: `Cannot use import statement outside a module` / `ERR_REQUIRE_ESM` | Add the package named in the stack trace to **`ssr.noExternal`** in `web/vite.config.ts`; rerun the SSR smoke test ([gotchas.md](gotchas.md) § SSR / [templates/vite-ssr-noexternal.example.ts](templates/vite-ssr-noexternal.example.ts)) |
 
 This file is **normative** for the skill’s “ship on first migration” behavior.

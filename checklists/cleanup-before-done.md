@@ -13,6 +13,13 @@ Do **not** declare the migration done until every item passes.
 - [ ] Local `(cd web && npm run build)` produces the **publish directory** referenced in **repo-root** `netlify.toml` (typically **`[build] base = "web"`** + **`publish = "dist/client"`** — **verify** with `ls web/dist` after build). Prefer **empty** Netlify UI build fields so the file is authoritative.
 - [ ] `@netlify/vite-plugin-tanstack-start` is installed in `web/` and wired in `vite.config.ts` if deploying to Netlify.
 - [ ] **`web/netlify.toml`** exists (from [templates/web-netlify.toml](../templates/web-netlify.toml)) so local **`vite dev`** works with the Netlify Vite plugin (`repositoryRoot` = `web/`).
+- [ ] **SSR smoke test passes** before pushing — `vite build` is not a runtime check:
+  ```bash
+  cd web && npm run build && \
+    node -e "import('./.netlify/v1/functions/server.mjs').then(() => console.log('SSR import OK')).catch(e => { console.error(e); process.exit(1) })"
+  ```
+  If it fails with `Cannot use import statement outside a module` or `ERR_REQUIRE_ESM`, add the package named in the stack to **`ssr.noExternal`** in `web/vite.config.ts` (see [gotchas.md](../gotchas.md) § SSR / [templates/vite-ssr-noexternal.example.ts](../templates/vite-ssr-noexternal.example.ts)) and rerun.
+- [ ] **After deploy, open the live URL** and confirm the SSR function renders the page (Netlify “build success” does not exercise the function).
 
 ## Optional Core Web Vitals (if optimizing Lighthouse)
 

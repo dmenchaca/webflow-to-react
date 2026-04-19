@@ -46,8 +46,10 @@ Migration progress:
 - [ ] 13. Analytics: follow the **export + user** (remove/replace GTM/GA/Hotjar per agreement — not every site uses Plausible; see [gotchas.md](gotchas.md)); set generator meta in HTML shell
 - [ ] 13b. **Optional CWV:** `web/netlify.toml` from [templates/web-netlify.toml](templates/web-netlify.toml); font preloads / deferred third-party scripts / hero image priorities per [gotchas.md](gotchas.md) § Core Web Vitals
 - [ ] 14. Scaffold .cursor/rules/* into the new project (see rules/)
-- [ ] 15. First-run ship: GitHub repo + Netlify — see shipping.md
-- [ ] 16. Run cleanup checklist (checklists/cleanup-before-done.md)
+- [ ] 15. **SSR import smoke test** before pushing — `vite build` is not a runtime check; see [gotchas.md](gotchas.md) § *Netlify SSR function crashes on first request* and [templates/vite-ssr-noexternal.example.ts](templates/vite-ssr-noexternal.example.ts). Per-site list, do not copy verbatim from another project.
+- [ ] 16. First-run ship: GitHub repo + Netlify — see shipping.md
+- [ ] 17. Open the live URL after deploy — Netlify “build success” does not exercise the function
+- [ ] 18. Run cleanup checklist (checklists/cleanup-before-done.md)
 ```
 
 ## Required reading before acting
@@ -66,6 +68,7 @@ Copy/adapt from `templates/`. TanStack Start also generates its own `vite.config
 - `templates/web-package.json` — **reference only**; prefer versions from TanStack Start + your additions
 - `templates/netlify.toml` — production CI (repo root); **`templates/web-netlify.toml`** — local `vite dev` / Netlify plugin root = `web/`
 - `templates/PlausibleLoader.tsx` (example **only if** the project uses Plausible), `templates/site-font-preload.example.ts`, `templates/performance-overrides.example.css` — optional CWV patterns (**adapt per site**)
+- `templates/vite-ssr-noexternal.example.ts` — `web/vite.config.ts` shape with the **`ssr.noExternal`** pattern + local SSR smoke test for Netlify function crashes (**per-site list**, do not paste another project's deps)
 - `templates/site-fonts.css`, `templates/marketing.css`, `MarketingSiteRoot.tsx` — same ideas as before, paths under `web/src/`
 
 ## Rules to scaffold
@@ -75,7 +78,7 @@ mkdir -p .cursor/rules
 cp ./rules/*.mdc .cursor/rules/   # from this skill repo root; or use ~/.cursor/skills/webflow-to-react/rules/ if installed globally
 ```
 
-- `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`, `performance-cwv.mdc`
+- `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`, `ssr-noexternal-netlify.mdc`, `performance-cwv.mdc`
 
 ## Tech stack (default)
 

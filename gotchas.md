@@ -75,6 +75,61 @@ TanStack Start controls the document via **`src/routes/__root.tsx`** `head()` (a
 
 Hooks that touch `document.documentElement` belong in effects that run **after** mount — same as SPA, but SSR will skip the body until hydrated; ensure the hook no-ops when `typeof document === 'undefined'`.
 
+### Netlify SSR function crashes on first request: `Cannot use import statement outside a module` / `ERR_REQUIRE_ESM` {#ssr-noexternal}
+
+This is the most common production-only failure mode after a green Netlify build. The build succeeds, the static site assets upload, but the **server function** (`web/.netlify/v1/functions/server.mjs` for TanStack Start + `@netlify/vite-plugin-tanstack-start`) crashes the first time it tries to render a route. The Netlify error page shows one of:
+
+- **`SyntaxError: Cannot use import statement outside a module`** with `node:internal/modules/cjs/loader` in the stack — Node loaded an ESM-only file (e.g. `node_modules/<pkg>/index.js`) through the **CommonJS** loader.
+- **`Error [ERR_REQUIRE_ESM]: require() of ES Module …`** — a CJS file inside a package called `require()` on an ESM-only sibling (`html-react-parser` → `domhandler` is a real example, but it can be **any** dep with the same shape).
+
+**Why `npm run build` does not catch this.** Vite's build is a bundler step. It does **not** start the function and import its code through Node's loader. Local **`vite dev`** uses Vite's transform pipeline, not the production CJS/ESM rules. The crash only happens when Node actually executes the function on Lambda — i.e. on the **first real request** after deploy.
+
+**Why this happens.** TanStack Start's SSR build externalizes `node_modules` into the Netlify function bundle by default, and Netlify traces those files into `/var/task/node_modules/...`. If a traced file is **ESM-only** but lands in a context Node treats as CJS (or vice versa), the loader throws. Common offender shapes:
+
+- Package `index.js` is ESM (`"type": "module"` or top-level `import` statements) but no `require` entry in `exports`.
+- A package's CJS file contains `require('<sibling>')` where `<sibling>`'s newer version is ESM-only.
+
+**Fix — bundle the offending package into the SSR chunk.** Add it to **`ssr.noExternal`** in `web/vite.config.ts`. Vite then **inlines** the package into `dist/server/assets/routes-*.js` and the Netlify function never reads the raw file, sidestepping Node's loader rules entirely.
+
+```ts
+// web/vite.config.ts
+export default defineConfig({
+  ssr: {
+    // Append the package(s) named in the Netlify function stack trace.
+    // Add transitive dependencies if they show up in subsequent crashes.
+    noExternal: [
+      // '<package-from-stack-trace>',
+      // '<its-esm-only-sibling-if-mentioned>',
+    ],
+  },
+  // …plugins
+})
+```
+
+**Diagnostic recipe (any site, any package).**
+
+1. Read the Netlify function error page. The first line of the stack trace contains `/var/task/node_modules/<pkg>/<file>` — that is the package to add.
+2. If the message is `require() of ES Module …`, both the **caller** package and the **ESM sibling** named in the message are candidates. Add the package being loaded; in stubborn cases add its parent too.
+3. Rebuild locally and run the **SSR import smoke test** below. Repeat for any new package the trace surfaces — these errors usually unmask one at a time.
+4. Push, redeploy, hit the live URL once.
+
+**Local SSR smoke test (catches this class of bug pre-deploy).**
+
+```bash
+cd web && npm run build && \
+  node -e "import('./.netlify/v1/functions/server.mjs')\
+    .then(() => console.log('SSR import OK'))\
+    .catch(e => { console.error('SSR import FAILED:', e); process.exit(1) })"
+```
+
+This imports the same function entry Netlify will run, through the same Node loader, against the same `node_modules`. If it logs `SSR import OK`, the function will at least start on Netlify. (It still does not exercise route handlers — for that, run `netlify dev`.)
+
+**What not to do.**
+
+- Do **not** patch `node_modules` or hand-edit the function output.
+- Do **not** assume which package is at fault on a new site — exports differ per Webflow project (one site uses `gsap`, another adds `html-react-parser`, another a CMS SDK). The list below is **observed examples**, not a default config: `gsap`, `html-react-parser`, `html-dom-parser`, `domhandler`, `react-property`, `style-to-js`. Add only what the **current site's** stack trace and smoke test demand.
+- If a dep is genuinely browser-only (e.g. a canvas/Rive runtime), the better fix is to **dynamic-import it inside a client effect** rather than bundling it into the server chunk — see § *Browser-only code must not run on the server*.
+
 ---
 
 ## Netlify + TanStack Start {#netlify}

@@ -1,0 +1,57 @@
+---
+description: Netlify SSR (TanStack Start) — fix `Cannot use import statement outside a module` / `ERR_REQUIRE_ESM` by adding the offending package to `ssr.noExternal` in `web/vite.config.ts`. Always run the SSR import smoke test before pushing.
+globs: "web/vite.config.ts,web/vite.config.*.ts,web/vite.config.js"
+alwaysApply: false
+---
+
+# SSR `noExternal` for Netlify (Webflow → TanStack Start)
+
+These crashes are runtime-only — `npm run build` and `vite dev` will not catch them. They surface on the **first request** to the deployed Netlify function.
+
+## When you see it
+
+The Netlify function crash page shows one of:
+
+- `SyntaxError: Cannot use import statement outside a module` with `node:internal/modules/cjs/loader` in the stack — Node tried to load an ESM-only file (e.g. `node_modules/<pkg>/index.js`) through the CommonJS loader.
+- `Error [ERR_REQUIRE_ESM]: require() of ES Module …` — a CJS file inside a package called `require()` on an ESM-only sibling.
+
+The first stack frame names the file: `/var/task/node_modules/<pkg>/<file>`. **`<pkg>` is what you add.**
+
+## Fix
+
+In `web/vite.config.ts`:
+
+```ts
+export default defineConfig({
+  ssr: {
+    noExternal: [
+      // Append the package name from the function stack trace.
+      // Add transitive deps if subsequent crashes name them.
+    ],
+  },
+  // …plugins
+})
+```
+
+Vite then **inlines** the package into `dist/server/assets/routes-*.js`, so the Netlify function never reads the raw file and Node's CJS/ESM rules stop applying.
+
+## Local SSR smoke test (run after every change to the list)
+
+```bash
+cd web && npm run build && \
+  node -e "import('./.netlify/v1/functions/server.mjs')\
+    .then(() => console.log('SSR import OK'))\
+    .catch(e => { console.error(e); process.exit(1) })"
+```
+
+If this prints `SSR import OK`, the same module graph will at least start on Netlify. Run it before every push that changes `vite.config.ts`, the route components, or the dependency graph.
+
+## Per-site discipline
+
+The list is **additive and per-site**. Different Webflow exports pull in different deps; a fixed list copied between projects either misses the real offender or bloats the SSR bundle.
+
+- ✅ Add packages your **current** stack trace and smoke test demand.
+- ❌ Do not paste another project's `noExternal` array as a default.
+- ❌ Do not add browser-only packages (Rive/canvas runtimes, anything that touches `window`) — `dynamic-import` them inside a `useEffect` so the server never imports them at all.
+
+See **[../gotchas.md](../gotchas.md) § SSR** and **[../templates/vite-ssr-noexternal.example.ts](../templates/vite-ssr-noexternal.example.ts)**.
