@@ -1,0 +1,88 @@
+/**
+ * Self-hosted fonts. Files live in web/public/fonts/ (anywhere else 404s in Vite dev).
+ *
+ * Keep Webflow's quirky family names ("Inter 18 Pt", "Plusjakartasans") so the
+ * verbatim-copied marketing CSS keeps resolving them.
+ *
+ * When the export only ships one weight file (e.g. PlusJakartaSans-ExtraBold.woff2),
+ * register it against multiple weights so bold (700) AND extrabold (800) resolve.
+ */
+@font-face {
+  font-family: "Inter 18 Pt";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/Inter_18pt-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter 18 Pt";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/Inter_18pt-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter 18 Pt";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/Inter_18pt-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter 18 Pt";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/Inter_18pt-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter 18 Pt";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/Inter_18pt-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter 18 Pt";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/Inter_18pt-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Plusjakartasans;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/PlusJakartaSans-ExtraBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: Plusjakartasans;
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/PlusJakartaSans-ExtraBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/PlusJakartaSans-ExtraBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/PlusJakartaSans-ExtraBold.woff2") format("woff2");
+}

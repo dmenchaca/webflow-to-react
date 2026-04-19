@@ -1,0 +1,92 @@
+---
+description: Keep GSAP animations from Webflow intact; initialize in useEffect with proper cleanup
+globs: "web/src/components/**/*.{tsx,jsx},web/src/hooks/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# GSAP in React (keep the Webflow animations intact)
+
+This project migrated from a Webflow export that uses **GSAP** (and sometimes ScrollTrigger/SplitText). The migration strategy is: **keep those animations as-is**, just wrap initialization in React's lifecycle. Do NOT rewrite them in Framer Motion.
+
+## Core pattern: `gsap.context()` inside `useEffect`
+
+```tsx
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+
+export function HeroSection() {
+  const scopeRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from('.hero-title', { y: 40, opacity: 0, duration: 1 })
+      gsap.to('.hero-cta', { scale: 1.05, yoyo: true, repeat: -1 })
+    }, scopeRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  return <div ref={scopeRef}>…</div>
+}
+```
+
+Why `gsap.context()`:
+
+- Scopes selectors to `scopeRef` so `.hero-title` doesn't match elsewhere on the page.
+- `ctx.revert()` kills every tween, removes every ScrollTrigger, and restores inline styles on unmount. One line, no leaks.
+- Safe under React 19 StrictMode's double-effect invocation (revert undoes the first run cleanly).
+
+## ScrollTrigger
+
+```tsx
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
+
+export function Section() {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from('.reveal', {
+        y: 60, opacity: 0, duration: 0.8,
+        scrollTrigger: { trigger: '.reveal', start: 'top 80%' },
+      })
+    }, ref)
+    return () => ctx.revert()
+  }, [])
+  return <div ref={ref}>…</div>
+}
+```
+
+After route changes, async content loads, or layout shifts, call `ScrollTrigger.refresh()`.
+
+## Rules
+
+### Do
+
+- Initialize GSAP **inside `useEffect`**, never during render.
+- Use `gsap.context(fn, scopeRef)` so selectors are scoped and cleanup is one call.
+- Return `() => ctx.revert()` from every effect that touches GSAP.
+- Register plugins **once** at module scope: `gsap.registerPlugin(ScrollTrigger)`.
+- For reusable global animations (hero reveals, marquee), consider a hook: `useHeroAnimations(containerRef)` wired in `MarketingSiteRoot`.
+
+### Don't
+
+- Don't call `gsap.to(...)` at the top level of a component or during render.
+- Don't reuse the same ScrollTrigger across multiple effect runs without `ctx.revert()` first.
+- Don't call `ScrollTrigger.kill()` manually when `ctx.revert()` already handles it.
+- Don't mix GSAP and CSS `@keyframes` on the same element — pick one per element.
+- Don't lazy-load GSAP on the client if the animation runs on first paint; load it normally.
+
+## When to preserve vs. drop Webflow's original JS
+
+- **GSAP code authored in Webflow custom code or added by the designer** → keep and port to `useEffect` with `gsap.context()`.
+- **`webflow.js` runtime** → drop; it's jQuery/Webflow Interactions glue, not GSAP.
+- **`jquery.js`** → drop.
+- **ScrollTrigger instances that were driven by Webflow Interactions 2.0** → these don't exist as GSAP code in the export. Re-create only what's essential using GSAP + ScrollTrigger directly.
+
+## Working with `AnimatePresence`-style exit animations
+
+If you need mount/unmount transitions, reach for `framer-motion` only for that specific case — don't wholesale swap the project's animation system.

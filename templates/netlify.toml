@@ -1,0 +1,11 @@
+# TanStack Start app in /web; Webflow export stays at repo root (read-only).
+# Install @netlify/vite-plugin-tanstack-start in web/ — see TanStack Start hosting docs.
+#
+# After first local build, confirm output path:
+#   (cd web && npm run build && ls dist)
+# If publish path differs, fix `publish` below (common: dist/client).
+#
+[build]
+  base = "web"
+  command = "npm ci && npm run build"
+  publish = "web/dist/client"

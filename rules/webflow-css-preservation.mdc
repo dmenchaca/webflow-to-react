@@ -1,0 +1,31 @@
+---
+description: Keep Webflow class names and compiled CSS verbatim during migration; don't refactor to Tailwind utilities until visual parity is confirmed
+globs: "web/src/components/**/*.{tsx,jsx},web/src/styles/marketing/**/*.css"
+alwaysApply: false
+---
+
+# Preserve Webflow's CSS and class names
+
+This project migrated from a Webflow HTML export. The fastest path to pixel parity is to **keep Webflow's compiled CSS and class names verbatim** and only refactor later, section by section.
+
+## Do
+
+- Put Webflow class names on JSX verbatim (`className="hero-section_wrapper"`, underscores and all).
+- Keep the compiled Webflow CSS split under `src/styles/marketing/` (`normalize.css`, `layout-components.css`, `<brand>.css`, etc.).
+- Rewrite asset URLs in copied CSS to root-relative: `url("/images/...")`, `url("/fonts/...")`.
+- When in doubt, diff against the root-level `index.html` (Webflow reference — read-only).
+
+## Don't
+
+- Don't translate Webflow breakpoints (479 / 767 / 991 px) to Tailwind screens while migrating. Leave the media queries inside the copied CSS.
+- Don't rename class names "to be cleaner" — it breaks parity and makes diffing against the reference impossible.
+- Don't start converting to Tailwind utilities across many sections at once. One section at a time, only after parity is confirmed.
+- Don't delete unused-looking rules from the compiled CSS during migration; Webflow CSS often cross-references many class combos.
+
+## Progressive refactor path (post-parity)
+
+1. Confirm pixel parity on all breakpoints.
+2. Pick one section. Replace its JSX classes with Tailwind utilities.
+3. Move any still-needed custom CSS into a section-scoped class.
+4. Delete the now-dead rules from the compiled CSS.
+5. Repeat.

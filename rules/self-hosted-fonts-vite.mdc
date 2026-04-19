@@ -1,0 +1,78 @@
+---
+description: Self-hosted fonts in Vite/TanStack Start — file location, @font-face import order, Webflow legacy family names
+globs: "web/src/styles.css,web/src/styles/site-fonts.css,web/src/styles/marketing.css,web/public/fonts/**,web/src/styles/**/*.css"
+alwaysApply: false
+---
+
+# Self-hosted fonts (Vite / TanStack Start)
+
+Fonts from a Webflow export are the single most common silent-failure point in this migration.
+
+## Rules
+
+### 1. Fonts MUST live in `web/public/fonts/`
+
+Vite's dev server refuses to serve files outside its root. If `.woff2` files live anywhere else (e.g. `<repo-root>/fonts/`), the dev server returns 404 and the browser **silently falls back to Arial**. You only notice because the design looks "off."
+
+### 2. Use root-relative URLs
+
+```css
+/* YES */
+src: url("/fonts/Inter_18pt-Regular.woff2") format("woff2");
+
+/* NO */
+src: url("../../fonts/Inter_18pt-Regular.woff2") format("woff2");
+```
+
+### 3. `@font-face` must be imported FIRST
+
+In `marketing.css`:
+
+```css
+@import "./site-fonts.css";             /* ← must be first */
+@import "./marketing/normalize.css";
+@import "./marketing/layout-components.css";
+/* ... */
+```
+
+If `body { font-family: "Foo" }` is parsed before the matching `@font-face` rule, some browsers register it against a non-existent family and never retry.
+
+### 4. Quote multi-word family names everywhere
+
+```css
+/* YES */
+font-family: "Plus Jakarta Sans", sans-serif;
+
+/* NO — parser reads three families: Plus, Jakarta, Sans */
+font-family: Plus Jakarta Sans, sans-serif;
+```
+
+### 5. Keep Webflow's quirky family names
+
+Webflow exports often reference `"Inter 18 Pt"` or `Plusjakartasans`. The compiled CSS already uses those strings. Keep them — aliasing causes more bugs than it fixes.
+
+### 6. One file, multiple weights when needed
+
+If the export only ships `PlusJakartaSans-ExtraBold.woff2`, register it against BOTH 700 and 800 so `font-weight: bold` AND `font-weight: 800` resolve without font synthesis.
+
+### 7. Never default `body` to `Arial`
+
+Some starters do this "for safety." Don't. Inherited text breaks wherever a component doesn't explicitly set a font. Use the brand body font on `body` with a sensible fallback stack.
+
+### 8. Copy Webflow’s global font-smoothing into base CSS
+
+`css/webflow.css` (and often inline `<style>` in the export `index.html`) sets on `*`:
+
+```css
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+```
+
+TanStack/Tailwind entry CSS usually omits this. On **macOS**, missing it leaves **subpixel** anti-aliasing — body text can look **bolder/darker** than production even when the correct woff2 loads. Add the same rules to global base CSS (e.g. `web/src/styles.css` `@layer base` on `*`).
+
+## Verification
+
+- DevTools → Network → filter Fonts: every request returns 200.
+- DevTools → Computed `font-family` on body: shows brand family, not fallback.
+- DevTools → Computed on sample text: `-webkit-font-smoothing` is **antialiased** (match live Webflow).
+- Bold and extrabold render from real woff2 files (not synthesized).

@@ -1,0 +1,43 @@
+---
+description: Floating widgets with iframes — z-index doesn't work, reserve layout space instead
+globs: "web/src/components/home/FloatingVideoWidget.tsx,web/src/components/home/**/Floating*.tsx,web/src/components/**/*Widget*.tsx"
+alwaysApply: false
+---
+
+# Floating widgets + iframes
+
+## Z-index doesn't beat iframes
+
+Iframes are separate compositor surfaces. Floating a button on top of one with just `z-index: 999` is unreliable across browsers and device modes.
+
+**Fix:** reserve layout space for the overlay control (e.g. `padding-top` or `margin-bottom` on the container above the iframe) so the close button has its own box. Use an explicit class like `.widget-container--with-close` instead of CSS `:has()` for the layout variant — `:has()` support is spotty in older Safari/WebViews.
+
+## Visibility via IntersectionObserver, not "always visible"
+
+Tie widget visibility to a specific anchor section's id using `IntersectionObserver` (or Framer Motion `useInView`). Never render floating widgets unconditionally.
+
+## Corner-snap docking: explicit state machine
+
+If the widget snaps to screen corners, model allowed transitions explicitly:
+
+```ts
+type Corner = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'
+const NEIGHBORS: Record<Corner, Corner[]> = {
+  topLeft: ['topRight', 'bottomLeft'],
+  topRight: ['topLeft', 'bottomRight'],
+  bottomLeft: ['topLeft', 'bottomRight'],
+  bottomRight: ['topRight', 'bottomLeft'],
+}
+```
+
+No diagonals, no implicit "closest corner" logic — it makes arrow controls inconsistent.
+
+## Dismissal state
+
+Default to component-local state (dismissal resets when the user scrolls away from the anchor section and back). That matches most UX expectations.
+
+If you add `localStorage` persistence, **document it clearly in the component** and ideally in `claude.md` — users otherwise report it as "the widget is broken, it won't come back."
+
+## Don't combine color transitions with blur reveals
+
+If the design calls for `backdrop-filter: blur()` to reveal a CTA on hover (typical for logo grids), don't also animate `background-color` on the same surface. The color shift reads as a separate visual bug on top of the blur effect.

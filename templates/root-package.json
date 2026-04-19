@@ -1,0 +1,10 @@
+{
+  "name": "<project-name>-webflow",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix web",
+    "build": "npm run build --prefix web",
+    "preview": "npm run preview --prefix web",
+    "lint": "npm run lint --prefix web"
+  }
+}

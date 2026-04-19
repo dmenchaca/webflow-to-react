@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title><!-- site title --></title>
+    <meta name="description" content="<!-- site description -->" />
+
+    <meta property="og:title" content="<!-- site title -->" />
+    <meta property="og:description" content="<!-- site description -->" />
+    <meta property="og:image" content="/images/og-cover.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<!-- site title -->" />
+    <meta name="twitter:description" content="<!-- site description -->" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content="Vite + React" />
+    <meta name="theme-color" content="#000000" />
+
+    <link href="/images/favicon.png" rel="shortcut icon" type="image/x-icon" />
+    <link href="/images/webclip.png" rel="apple-touch-icon" />
+
+    <style>
+      * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+
+    <!-- Analytics: Plausible. Replace data-domain or remove if analytics not wanted. -->
+    <script
+      defer
+      data-domain="<!-- your-domain.com -->"
+      src="https://plausible.io/js/script.js"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

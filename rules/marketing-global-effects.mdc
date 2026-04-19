@@ -1,0 +1,41 @@
+---
+description: Global-effect hooks belong in MarketingSiteRoot, not scattered across sections
+globs: "web/src/components/MarketingSiteRoot.tsx,web/src/hooks/**/*.{ts,tsx},web/src/components/home/**/*.tsx"
+alwaysApply: false
+---
+
+# Global effects live in MarketingSiteRoot
+
+This project replaced Webflow's jQuery-based runtime with React hooks. All **cross-cutting** side effects (touch detection, tooltips, iframe resize, keyboard shortcuts, Rive animations) are centralized in `MarketingSiteRoot.tsx` on a single container ref.
+
+## Do
+
+- Add new global-effect hooks to `src/hooks/` with a `useFoo` naming pattern.
+- Wire them in `MarketingSiteRoot` next to the existing hooks.
+- Keep hooks **idempotent** and have them **clean up on unmount** (return teardown from `useEffect`).
+- Accept a `containerRef` if the hook needs DOM scope; use `document`-scoped listeners only when truly global.
+- Give `MarketingSiteRoot`'s div `className="contents"` so the wrapper doesn't affect layout.
+
+## Don't
+
+- Don't attach global event listeners (`window.addEventListener`) from inside section components — it's hard to trace, easy to leak.
+- Don't replicate the same effect across multiple sections. Promote to `MarketingSiteRoot`.
+- Don't forget cleanup — React 19 + StrictMode will surface leaks by double-invoking effects in dev.
+
+## Typical hooks in this project
+
+- `useTouchClass` — toggles `.touch` on root based on `(pointer: coarse)`.
+- `useKeyboardShortcuts(containerRef)` — global hotkeys scoped to the marketing tree.
+- `useTestimonialIframeResize` — listens for `postMessage` to resize embedded iframes.
+- `useRelumeTooltips` — attaches shadcn tooltips to legacy Relume tooltip markup.
+- `useRiveAnimations(containerRef)` — plays Rive artboards with IntersectionObserver.
+
+## Section-level vs global
+
+| Use case | Where it lives |
+|---|---|
+| A scroll reveal for one section | The section itself (`AnimatedBlock` / `whileInView`) |
+| Local tab/accordion state | The section itself |
+| Tooltip detection across the tree | `MarketingSiteRoot` hook |
+| Keyboard shortcuts that navigate sections | `MarketingSiteRoot` hook |
+| Iframe resize for testimonial widget | `MarketingSiteRoot` hook |
