@@ -12,7 +12,7 @@ Catalog, don't touch:
 - `js/` folder:
   - `jquery*.js`, `webflow.js` → **drop**, replaced by React.
   - `gsap*`, `ScrollTrigger*`, `SplitText*`, any custom GSAP code → **keep**, port to **client-only** `useEffect` + `gsap.context()` (see §8).
-- Analytics scripts in `<head>` — catalog and replace (default: Plausible).
+- Analytics scripts in `<head>` — catalog; replacement is **user-dependent** (none, Plausible, Fathom, keep GA via GTM, etc.).
 - Hidden sections in the export — if the ZIP **does not** include `w-hidden` / `hide` on nodes that are hidden in the **live** Designer, see [gotchas.md](gotchas.md) — you may need to add classes manually after comparing to production.
 - Dead HTML pages (`style-guide.html`, `401.html`, `404.html`) — drop unless asked.
 
@@ -159,7 +159,7 @@ Same as legacy playbook: `className`, void tags, inline styles, preserve classes
 
 ## 7. Replace runtime behavior
 
-Same mapping table as before (nav, tooltips, iframes, touch class, Plausible). Hooks stay in `src/hooks/` and run in client components / `useEffect`.
+Same mapping table as before (nav, tooltips, iframes, touch class, analytics if any). Hooks stay in `src/hooks/` and run in client components / `useEffect`.
 
 ## 8. GSAP + SSR
 
@@ -204,7 +204,7 @@ Copy **[templates/web-netlify.toml](templates/web-netlify.toml)** to **`web/netl
 After visual parity, optionally improve Lighthouse / PageSpeed:
 
 1. **Font preloads** for hero-critical **woff2** files — [templates/site-font-preload.example.ts](templates/site-font-preload.example.ts); wire into **`__root.tsx` `head()`** before the main stylesheet.
-2. **Deferred Plausible** (or adapt for another host) — [templates/PlausibleLoader.tsx](templates/PlausibleLoader.tsx); set **`VITE_PLAUSIBLE_DOMAIN`** in **`web/.env`**; remove blocking `<script>` from `<head>`.
+2. **Deferred lightweight analytics** — if the site uses **Plausible**, see [templates/PlausibleLoader.tsx](templates/PlausibleLoader.tsx) (`VITE_PLAUSIBLE_DOMAIN` in **`web/.env`**). For **other** scripts, use the same **load + idle** injection idea or the vendor’s documented snippet; **skip** if the user wants no analytics.
 3. **CLS overrides** — last-imported CSS — [templates/performance-overrides.example.css](templates/performance-overrides.example.css); tune selectors per **that** export’s markup.
 4. **LCP images** — **`loading="eager"`** + **`fetchPriority="high"`** for obvious hero images; keep **`lazy`** below the fold.
 

@@ -1,10 +1,12 @@
 /**
- * Deferred analytics loader (Plausible). Generic pattern for any site:
- * - Set VITE_PLAUSIBLE_DOMAIN in web/.env (e.g. your apex domain, no protocol).
- * - Mount <PlausibleLoader /> once in the root shell (e.g. __root.tsx body), not a
- *   blocking <script> in <head> — reduces PageSpeed “forced reflow” from third-party JS.
+ * Example: deferred **Plausible** loader — use **only** when this migration chose Plausible.
+ * Many Webflow exports use GTM, GA, other pixels, or no analytics; do not add this by default.
  *
- * For Fathom / other lightweight scripts, adapt the same pattern (inject after load + idle).
+ * - Set VITE_PLAUSIBLE_DOMAIN in web/.env (apex host, no protocol).
+ * - Mount <PlausibleLoader /> once in the root shell (e.g. __root.tsx body), not a blocking
+ *   <script> in <head> — reduces PageSpeed “forced reflow” attribution.
+ *
+ * For Fathom / other small scripts, adapt the same inject-after-idle pattern with their URL.
  */
 import { useEffect } from 'react'
 

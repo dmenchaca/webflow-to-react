@@ -17,7 +17,7 @@ Do **not** declare the migration done until every item passes.
 ## Optional Core Web Vitals (if optimizing Lighthouse)
 
 - [ ] **Font preloads** in root `head()` only for **above-the-fold** `woff2` files listed in `site-fonts.css` — see [gotchas.md](../gotchas.md) § Core Web Vitals.
-- [ ] **Analytics:** third-party scripts **not** blocking in `<head>` (e.g. deferred Plausible pattern in [templates/PlausibleLoader.tsx](../templates/PlausibleLoader.tsx)); **per-site** env/domain.
+- [ ] **Analytics (if any):** third-party scripts **not** blocking in `<head>` where possible; for Plausible specifically, optional [templates/PlausibleLoader.tsx](../templates/PlausibleLoader.tsx); **per-site** vendor and env.
 - [ ] **CLS:** optional `performance-overrides.css` (last import) only with **per-export** selectors — [templates/performance-overrides.example.css](../templates/performance-overrides.example.css).
 - [ ] **LCP images** in hero: **`loading="eager"`** / **`fetchPriority="high"`** where appropriate for **that** export.
 
@@ -51,7 +51,7 @@ Do **not** declare the migration done until every item passes.
 - [ ] Root HTML shell (TanStack Start entry / route head) has the right `<title>` and description.
 - [ ] `<meta name="generator">` is **not** `Webflow` — use something accurate (`TanStack Start`, `Vite + React`, etc.).
 - [ ] OG/Twitter meta tags match the original site.
-- [ ] Plausible (or agreed analytics) script is present; **no GTM, GA, or Hotjar** unless requested.
+- [ ] Agreed analytics behavior matches the export + user (removed, replaced, or kept per brief); **no extra** GTM/GA/Hotjar unless requested.
 - [ ] Favicon + webclip resolve.
 
 ## Sections coverage

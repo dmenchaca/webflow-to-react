@@ -22,7 +22,7 @@ Complete this audit **before** writing any code. It takes ~20 minutes and saves 
 - [ ] Check for GSAP: `gsap*.js`, `ScrollTrigger*.js`, `SplitText*.js` in `js/`, or inline `<script>` blocks that call `gsap.*`. GSAP is **kept** — ported to `useEffect` + `gsap.context()`.
 - [ ] List GSAP timelines (each section's custom code). These become per-section `useEffect` hooks in the ported React code.
 - [ ] Grep `index.html` for `<script>` tags. List third-party embeds (calendly, chat widgets, video embeds). These usually survive.
-- [ ] Identify analytics: GTM, GA, Hotjar, Meta Pixel. Confirm replacement with user (default: Plausible).
+- [ ] Identify analytics: GTM, GA, Hotjar, Meta Pixel, Plausible, Fathom, or none. Confirm keep/replace/remove with user — **no default vendor**.
 - [ ] Check for Webflow Interactions 2.0 (`data-w-id`, inline `<script>` with declarative JSON). These are **not** GSAP — confirm with user which are essential, drop the rest.
 
 ## CSS
@@ -44,9 +44,9 @@ Complete this audit **before** writing any code. It takes ~20 minutes and saves 
 
 ## Integrations to confirm with user
 
-- [ ] Analytics replacement (Plausible vs. GA vs. nothing)?
+- [ ] Analytics: which vendor or none?
 - [ ] Deploy target (Netlify / Vercel / self-hosted)?
-- [ ] Domain / Plausible data-domain value?
+- [ ] Production domain / analytics IDs (per chosen tool)?
 - [ ] Will there be a CMS later? (Affects whether to build pages as hard-coded arrays or CMS-backed.)
 - [ ] Multi-page marketing beyond home? TanStack Router file routes cover this — confirm scope (blog, legal, locales).
 

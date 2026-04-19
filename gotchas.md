@@ -134,7 +134,9 @@ Keep **`font-display: swap`** (or `optional`) in **`site-fonts.css`**. For **LCP
 
 ### Third-party analytics and “forced reflow”
 
-A **`defer`** script in `<head>` still runs early enough that lab tools attribute **layout thrash** to it. **Plausible** (and similar small scripts): **inject after `window` `load` + `requestIdleCallback`** via a tiny client-only component — see **[templates/PlausibleLoader.tsx](templates/PlausibleLoader.tsx)** (`VITE_PLAUSIBLE_DOMAIN` in `.env`). **Google Tag Manager** is a different beast (tag manager + tags); do not pretend it’s the same pattern — keep GTM out unless the user insists, per migration defaults.
+Not every export uses analytics; when it does, it may be **GTM, GA, Meta Pixel, Plausible, Fathom**, etc. — **ask or follow the user**, do not default to one vendor.
+
+A **`defer`** script in `<head>` still runs early enough that lab tools attribute **layout thrash** to it. For **small first-party-style** scripts (e.g. **Plausible** or **Fathom**), prefer **injecting after `window` `load` + `requestIdleCallback`** via a tiny client-only component — see **[templates/PlausibleLoader.tsx](templates/PlausibleLoader.tsx)** as an example **only when Plausible is chosen** (`VITE_PLAUSIBLE_DOMAIN` in `.env`); adapt the URL/domain pattern for other hosts. **Google Tag Manager** is a different beast (tag manager + tags); do not treat it like a single defer script — scope and performance tradeoffs differ; only add if the user requires it.
 
 ### CLS from Webflow layout (overlays, grids, `%` positioning)
 

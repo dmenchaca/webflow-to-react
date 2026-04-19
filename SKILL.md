@@ -39,12 +39,12 @@ Migration progress:
 - [ ] 8. Write web/src/styles/site-fonts.css (@font-face FIRST)
 - [ ] 9. Write web/src/styles/marketing.css barrel in the right order
 - [ ] 10. Integrate marketing styles in TanStack root layout (__root.tsx) + routes
-- [ ] 10b. **Port the export `index.html` `<head>`** into `__root.tsx` (title, description, OG/Twitter, favicon links, theme-color, Plausible/scripts) — TanStack Start has no static `index.html`; skipping this loses SEO and icons even when assets exist in `public/`
+- [ ] 10b. **Port the export `index.html` `<head>`** into `__root.tsx` (title, description, OG/Twitter, favicon links, theme-color, analytics/scripts if any) — TanStack Start has no static `index.html`; skipping this loses SEO and icons even when assets exist in `public/`
 - [ ] 10c. **Global font-smoothing:** copy Webflow’s `* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale }` (from `css/webflow.css` / `index.html`) into the app’s global CSS (e.g. `styles.css` `@layer base`) — without it, macOS often renders text **heavier** than production (see [gotchas.md](gotchas.md) § *Copy Webflow’s global font-smoothing*)
 - [ ] 11. Port sections into routes or components under web/src/
 - [ ] 12. Keep GSAP in client-only code (useEffect + gsap.context); drop jQuery/webflow.js
-- [ ] 13. Swap GTM/GA for Plausible (or user’s choice); set generator meta in HTML shell
-- [ ] 13b. **Optional CWV:** `web/netlify.toml` from [templates/web-netlify.toml](templates/web-netlify.toml); font preloads / deferred analytics / hero image priorities per [gotchas.md](gotchas.md) § Core Web Vitals
+- [ ] 13. Analytics: follow the **export + user** (remove/replace GTM/GA/Hotjar per agreement — not every site uses Plausible; see [gotchas.md](gotchas.md)); set generator meta in HTML shell
+- [ ] 13b. **Optional CWV:** `web/netlify.toml` from [templates/web-netlify.toml](templates/web-netlify.toml); font preloads / deferred third-party scripts / hero image priorities per [gotchas.md](gotchas.md) § Core Web Vitals
 - [ ] 14. Scaffold .cursor/rules/* into the new project (see rules/)
 - [ ] 15. First-run ship: GitHub repo + Netlify — see shipping.md
 - [ ] 16. Run cleanup checklist (checklists/cleanup-before-done.md)
@@ -65,7 +65,7 @@ Copy/adapt from `templates/`. TanStack Start also generates its own `vite.config
 - `templates/root-package.json` — proxy scripts to `web/`
 - `templates/web-package.json` — **reference only**; prefer versions from TanStack Start + your additions
 - `templates/netlify.toml` — production CI (repo root); **`templates/web-netlify.toml`** — local `vite dev` / Netlify plugin root = `web/`
-- `templates/PlausibleLoader.tsx`, `templates/site-font-preload.example.ts`, `templates/performance-overrides.example.css` — optional CWV patterns (**adapt per site**)
+- `templates/PlausibleLoader.tsx` (example **only if** the project uses Plausible), `templates/site-font-preload.example.ts`, `templates/performance-overrides.example.css` — optional CWV patterns (**adapt per site**)
 - `templates/site-fonts.css`, `templates/marketing.css`, `MarketingSiteRoot.tsx` — same ideas as before, paths under `web/src/`
 
 ## Rules to scaffold
@@ -85,7 +85,7 @@ cp ./rules/*.mdc .cursor/rules/   # from this skill repo root; or use ~/.cursor/
 - **Tailwind CSS v4** via `@tailwindcss/vite`
 - **shadcn/ui** (`base-nova`) where components are needed
 - **GSAP** — keep from export; **client-only** initialization (see gotchas § SSR)
-- **Plausible** for analytics (unless user asks otherwise)
+- **Analytics** — match the export and user choice (Plausible, Fathom, none, etc.; do not assume Plausible)
 - **Netlify** — `@netlify/vite-plugin-tanstack-start` + `netlify.toml` (see templates)
 
 **Legacy opt-out:** If the user explicitly wants a **plain Vite SPA** (no SSR), follow the older Vite-only paths still described in playbook appendix; do not force TanStack Start against their wishes.

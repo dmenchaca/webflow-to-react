@@ -11,7 +11,7 @@ Read **[gotchas.md](../gotchas.md) § Core Web Vitals** and **[playbook.md](../p
 ## Principles
 
 1. **Per-site** — hero markup, font files, and LCP image differ per export. Copy patterns from **`templates/`**, not hard-coded domains or selectors from one project.
-2. **Third-party scripts** — defer injection (e.g. **[templates/PlausibleLoader.tsx](../templates/PlausibleLoader.tsx)**) after **`load` + `requestIdleCallback`**. Do not add GTM as a “small script” — different cost model.
+2. **Third-party scripts** — only if the project uses analytics; defer lightweight hosts (example: **[templates/PlausibleLoader.tsx](../templates/PlausibleLoader.tsx)** when **Plausible** is chosen) after **`load` + `requestIdleCallback`**. GTM / heavy tag managers are not the same pattern — different cost model.
 3. **Font preload** — only **above-the-fold** **`woff2`** URLs that match **`site-fonts.css`**; **`crossOrigin: 'anonymous'`** on link tags.
 4. **CLS** — optional last-imported CSS for **percentage-based overlays**; verify in DevTools per export.
 5. **Render-blocking CSS** — a single large bundle is **normal**; “fixing” the audit often needs critical CSS or route splits — don’t promise a green score without scope.
