@@ -7,8 +7,9 @@ description: >-
   wants to migrate to React, when they mention TanStack Start, TanStack Router,
   SSR, "convert Webflow to React", or when a repo already contains a Webflow
   export at its root. Covers folder layout, font self-hosting, CSS preservation,
-  global-effect hooks, first-run GitHub + Netlify ship (MCP + auth fallbacks), and
-  GSAP kept intact (not rewritten in Framer Motion).
+  global-effect hooks, first-run GitHub + Netlify ship (MCP + auth fallbacks),
+  optional Core Web Vitals patterns (font preload, deferred analytics, CLS tweaks;
+  adapt per export), and GSAP kept intact (not rewritten in Framer Motion).
 ---
 
 # Webflow → TanStack Start (React) migration
@@ -42,7 +43,8 @@ Migration progress:
 - [ ] 10c. **Global font-smoothing:** copy Webflow’s `* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale }` (from `css/webflow.css` / `index.html`) into the app’s global CSS (e.g. `styles.css` `@layer base`) — without it, macOS often renders text **heavier** than production (see [gotchas.md](gotchas.md) § *Copy Webflow’s global font-smoothing*)
 - [ ] 11. Port sections into routes or components under web/src/
 - [ ] 12. Keep GSAP in client-only code (useEffect + gsap.context); drop jQuery/webflow.js
-- [ ] 13. Swap GTM/GA for Plausible; set generator meta in HTML shell
+- [ ] 13. Swap GTM/GA for Plausible (or user’s choice); set generator meta in HTML shell
+- [ ] 13b. **Optional CWV:** `web/netlify.toml` from [templates/web-netlify.toml](templates/web-netlify.toml); font preloads / deferred analytics / hero image priorities per [gotchas.md](gotchas.md) § Core Web Vitals
 - [ ] 14. Scaffold .cursor/rules/* into the new project (see rules/)
 - [ ] 15. First-run ship: GitHub repo + Netlify — see shipping.md
 - [ ] 16. Run cleanup checklist (checklists/cleanup-before-done.md)
@@ -52,7 +54,7 @@ Migration progress:
 
 1. **[playbook.md](playbook.md)** — bootstrap order, TanStack Start layout, CSS, components.
 2. **[shipping.md](shipping.md)** — **first-run** GitHub (MCP) + Netlify + **unauthenticated** fallbacks.
-3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, **Netlify + TanStack deploy (`[build] base`, UI overrides)**, GSAP, iframes.
+3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, **Netlify + TanStack deploy (`[build] base`, `web/netlify.toml`, UI overrides)**, **Core Web Vitals**, GSAP, iframes.
 4. **[checklists/pre-migration.md](checklists/pre-migration.md)**
 5. **[checklists/cleanup-before-done.md](checklists/cleanup-before-done.md)**
 
@@ -62,7 +64,8 @@ Copy/adapt from `templates/`. TanStack Start also generates its own `vite.config
 
 - `templates/root-package.json` — proxy scripts to `web/`
 - `templates/web-package.json` — **reference only**; prefer versions from TanStack Start + your additions
-- `templates/netlify.toml` — Netlify monorepo + TanStack Start publish path
+- `templates/netlify.toml` — production CI (repo root); **`templates/web-netlify.toml`** — local `vite dev` / Netlify plugin root = `web/`
+- `templates/PlausibleLoader.tsx`, `templates/site-font-preload.example.ts`, `templates/performance-overrides.example.css` — optional CWV patterns (**adapt per site**)
 - `templates/site-fonts.css`, `templates/marketing.css`, `MarketingSiteRoot.tsx` — same ideas as before, paths under `web/src/`
 
 ## Rules to scaffold
@@ -72,7 +75,7 @@ mkdir -p .cursor/rules
 cp ./rules/*.mdc .cursor/rules/   # from this skill repo root; or use ~/.cursor/skills/webflow-to-react/rules/ if installed globally
 ```
 
-- `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`
+- `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`, `performance-cwv.mdc`
 
 ## Tech stack (default)
 

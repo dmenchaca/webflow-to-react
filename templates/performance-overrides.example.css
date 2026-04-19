@@ -1,0 +1,15 @@
+/*
+ * Optional last import in marketing.css barrel — targeted CLS fixes per site.
+ * Webflow exports often use percentage-based `inset` / `top` on decorative overlays
+ * (grids, gradients). When the parent height resolves late (fonts, images), PSI
+ * reports layout shift. Fix with stable units or `inset: 0` in a narrow media query
+ * only if visual parity allows.
+ *
+ * Example (replace selectors with your export’s classes):
+ *
+ * @media screen and (max-width: 991px) {
+ *   #hero .your-overlay-class {
+ *     inset: 0;
+ *   }
+ * }
+ */

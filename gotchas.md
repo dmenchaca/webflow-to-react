@@ -114,6 +114,40 @@ Some users cannot clear **Package directory** while **Base** is set (the UI enfo
 
 If **\*.netlify.app** works but the **apex domain** 404s, check **Domain management** (DNS / Netlify DNS) — not the same class of bug as miswired `publish`/`base`.
 
+### `web/netlify.toml` for local `vite dev`
+
+`@netlify/vite-plugin` sets **`repositoryRoot` = Vite root (`web/`)**. If the only config is repo-root `netlify.toml` with **`[build] base = "web"`**, Netlify resolves **`web/web`**. Add **`web/netlify.toml`** (no `base`; `publish = "dist/client"`) — see **[templates/web-netlify.toml](templates/web-netlify.toml)**. Production CI still uses the **root** `netlify.toml`.
+
+---
+
+## Core Web Vitals (Lighthouse / PageSpeed) {#cwv}
+
+Applies to **any** migrated Webflow site: scores depend on CSS weight, fonts, hero images, and third-party scripts — not one-size-fits-all numbers.
+
+### Render-blocking CSS
+
+Vite emits a **main stylesheet** (Tailwind + copied Webflow CSS). Browsers treat it as **render-blocking** until downloaded — PageSpeed will often flag it. **Fully “fixing”** that without visual regressions usually means **critical CSS**, **route-level CSS splitting**, or accepting the audit. Do not hack `media="print" onload` on the **entire** bundle unless you know the tradeoffs.
+
+### Self-hosted fonts: `preload` + `font-display`
+
+Keep **`font-display: swap`** (or `optional`) in **`site-fonts.css`**. For **LCP / CLS**, add **`<link rel="preload" as="font" type="font/woff2" crossorigin>`** in the root route **`head()`** for **only** the **above-the-fold** weights you actually use (derive `href` from `@font-face` paths). See **[templates/site-font-preload.example.ts](templates/site-font-preload.example.ts)**. Too many preloads hurts mobile.
+
+### Third-party analytics and “forced reflow”
+
+A **`defer`** script in `<head>` still runs early enough that lab tools attribute **layout thrash** to it. **Plausible** (and similar small scripts): **inject after `window` `load` + `requestIdleCallback`** via a tiny client-only component — see **[templates/PlausibleLoader.tsx](templates/PlausibleLoader.tsx)** (`VITE_PLAUSIBLE_DOMAIN` in `.env`). **Google Tag Manager** is a different beast (tag manager + tags); do not pretend it’s the same pattern — keep GTM out unless the user insists, per migration defaults.
+
+### CLS from Webflow layout (overlays, grids, `%` positioning)
+
+Decorative layers often use **`position: absolute`** with **percentage `inset` / `top`**. When the parent’s height changes (fonts loading, images), overlays **shift**. Add a **last-imported** small override file (e.g. `performance-overrides.css`) with **narrow media queries** and **stable** `inset` / `min-height` only where parity allows — see **[templates/performance-overrides.example.css](templates/performance-overrides.example.css)**. **Inspect the export’s hero** in DevTools; class names differ per site.
+
+### LCP images
+
+For the **largest above-the-fold** image(s) in the hero (logo, illustration), prefer **`loading="eager"`** and **`fetchPriority="high"`** — not `lazy`. Pick images per export; do not lazy-load the obvious LCP candidate.
+
+### App bundle reflow (`routes-*.js`)
+
+**Framer Motion**, **hydration**, and **router** code can still show small “forced reflow” in Lighthouse. That is not fully eliminable on a rich page; prioritize **third-party deferral** and **font/CLS** first.
+
 ---
 
 ## CSS preservation

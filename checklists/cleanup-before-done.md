@@ -12,6 +12,14 @@ Do **not** declare the migration done until every item passes.
 
 - [ ] Local `(cd web && npm run build)` produces the **publish directory** referenced in **repo-root** `netlify.toml` (typically **`[build] base = "web"`** + **`publish = "dist/client"`** — **verify** with `ls web/dist` after build). Prefer **empty** Netlify UI build fields so the file is authoritative.
 - [ ] `@netlify/vite-plugin-tanstack-start` is installed in `web/` and wired in `vite.config.ts` if deploying to Netlify.
+- [ ] **`web/netlify.toml`** exists (from [templates/web-netlify.toml](../templates/web-netlify.toml)) so local **`vite dev`** works with the Netlify Vite plugin (`repositoryRoot` = `web/`).
+
+## Optional Core Web Vitals (if optimizing Lighthouse)
+
+- [ ] **Font preloads** in root `head()` only for **above-the-fold** `woff2` files listed in `site-fonts.css` — see [gotchas.md](../gotchas.md) § Core Web Vitals.
+- [ ] **Analytics:** third-party scripts **not** blocking in `<head>` (e.g. deferred Plausible pattern in [templates/PlausibleLoader.tsx](../templates/PlausibleLoader.tsx)); **per-site** env/domain.
+- [ ] **CLS:** optional `performance-overrides.css` (last import) only with **per-export** selectors — [templates/performance-overrides.example.css](../templates/performance-overrides.example.css).
+- [ ] **LCP images** in hero: **`loading="eager"`** / **`fetchPriority="high"`** where appropriate for **that** export.
 
 ## Bundle hygiene
 

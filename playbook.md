@@ -195,6 +195,21 @@ Do **not** ship with only `npm ci --prefix web && npm run build --prefix web` fr
 
 Install `@netlify/vite-plugin-tanstack-start` in `web/` (see §3.3).
 
+### 9.1. `web/netlify.toml` (local dev)
+
+Copy **[templates/web-netlify.toml](templates/web-netlify.toml)** to **`web/netlify.toml`** so `vite dev` does not resolve **`web/web`** when the Netlify Vite plugin uses **`web/`** as config root. Keep repo-root **`netlify.toml`** for production (see §9).
+
+### 9.2. Core Web Vitals (optional, any site)
+
+After visual parity, optionally improve Lighthouse / PageSpeed:
+
+1. **Font preloads** for hero-critical **woff2** files — [templates/site-font-preload.example.ts](templates/site-font-preload.example.ts); wire into **`__root.tsx` `head()`** before the main stylesheet.
+2. **Deferred Plausible** (or adapt for another host) — [templates/PlausibleLoader.tsx](templates/PlausibleLoader.tsx); set **`VITE_PLAUSIBLE_DOMAIN`** in **`web/.env`**; remove blocking `<script>` from `<head>`.
+3. **CLS overrides** — last-imported CSS — [templates/performance-overrides.example.css](templates/performance-overrides.example.css); tune selectors per **that** export’s markup.
+4. **LCP images** — **`loading="eager"`** + **`fetchPriority="high"`** for obvious hero images; keep **`lazy`** below the fold.
+
+Details and limits (e.g. render-blocking CSS): [gotchas.md](gotchas.md) § Core Web Vitals.
+
 ## 10. First-run ship (GitHub + Netlify)
 
 **Mandatory on first migration** when the user wants the project online:

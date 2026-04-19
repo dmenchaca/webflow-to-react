@@ -1,3 +1,6 @@
+# Production / CI — repository root. For local `vite dev`, also add **`web/netlify.toml`**
+# from templates/web-netlify.toml (Netlify Vite plugin uses `web/` as config root).
+#
 # TanStack Start app in web/; Webflow export stays at repo root (read-only).
 # Install @netlify/vite-plugin-tanstack-start in web/ — see TanStack Start hosting docs.
 #

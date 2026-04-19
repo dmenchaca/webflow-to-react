@@ -27,6 +27,10 @@ Any non-empty **Build command** in the dashboard **overrides** `netlify.toml`. N
 
 Some UIs **mirror Base directory → Package directory**. If you cannot clear fields, rely on **file-based config** at the repo root and clear overrides after each save if needed.
 
-## 5. Verify deploys
+## 5. `web/netlify.toml` for local dev
+
+When **`vite dev`** runs with Vite **`root` = `web/`**, `@netlify/dev` sets **`repositoryRoot` = `web/`**. Repo-root **`[build] base = "web"`** would then resolve to **`web/web`**. Add **`web/netlify.toml`** (no `base`; **`publish = "dist/client"`**) — **[templates/web-netlify.toml](../templates/web-netlify.toml)**. Production still uses the **repo-root** file.
+
+## 6. Verify deploys
 
 After deploy, logs should show a real **`npm ci` / `vite build`**, not a bogus command. If SSR is used, expect **functions** or plugin output under **`web/.netlify/`** during build — not necessarily `netlify/functions` at repo root unless you added that layout.

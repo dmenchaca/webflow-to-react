@@ -1,0 +1,12 @@
+# Local `vite dev` + @netlify/vite-plugin: Netlify Dev uses Vite’s root (`web/`) as
+# `repositoryRoot`. Repo-root `netlify.toml` uses `[build] base = "web"` for CI;
+# that `base` must NOT apply here or Netlify resolves `web/web`. Production still
+# uses ../netlify.toml — see templates/netlify.toml.
+
+[build]
+  command = "npm ci && npm run build"
+  publish = "dist/client"
+
+[dev]
+  command = "npm run dev"
+  port = 3000

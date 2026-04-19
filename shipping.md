@@ -103,6 +103,7 @@ If `netlify login` fails, use the **dashboard** method in §2.1.
   (cd web && npm run build && ls -la dist)
   ```
 - After deploy, build logs should show the real **`npm ci` / `vite build`**, not a bogus command. See [gotchas.md](gotchas.md) § Netlify for symptoms (404 despite “success”, **0 new functions** when SSR should upload).
+- **Local `vite dev`:** add **`web/netlify.toml`** from [templates/web-netlify.toml](templates/web-netlify.toml) so `@netlify/vite-plugin` does not resolve **`web/web`** when `repositoryRoot` is **`web/`** (see gotchas § Netlify).
 
 ---
 
@@ -125,5 +126,6 @@ Local build OK → git commit → GitHub repo (MCP or gh or manual) → push
 | Wrong publish dir | Run local `npm run build` in `web/` and list `dist/` |
 | Build command shows `netlify.toml` or other junk | Clear **Build command** in UI so repo `netlify.toml` applies |
 | 404 after “successful” deploy, `0` new functions | Use `[build] base = "web"` in `netlify.toml`; avoid `--prefix`-only builds (see [gotchas.md](gotchas.md) § Netlify) |
+| `vite dev` error: Base directory `…/web/web` does not exist | Add **`web/netlify.toml`** from [templates/web-netlify.toml](templates/web-netlify.toml) |
 
 This file is **normative** for the skill’s “ship on first migration” behavior.
