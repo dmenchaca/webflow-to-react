@@ -52,7 +52,7 @@ Migration progress:
 
 1. **[playbook.md](playbook.md)** — bootstrap order, TanStack Start layout, CSS, components.
 2. **[shipping.md](shipping.md)** — **first-run** GitHub (MCP) + Netlify + **unauthenticated** fallbacks.
-3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, GSAP, iframes.
+3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, **Netlify + TanStack deploy (`[build] base`, UI overrides)**, GSAP, iframes.
 4. **[checklists/pre-migration.md](checklists/pre-migration.md)**
 5. **[checklists/cleanup-before-done.md](checklists/cleanup-before-done.md)**
 
@@ -72,7 +72,7 @@ mkdir -p .cursor/rules
 cp ./rules/*.mdc .cursor/rules/   # from this skill repo root; or use ~/.cursor/skills/webflow-to-react/rules/ if installed globally
 ```
 
-- `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`
+- `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`
 
 ## Tech stack (default)
 

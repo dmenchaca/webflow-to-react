@@ -77,6 +77,45 @@ Hooks that touch `document.documentElement` belong in effects that run **after**
 
 ---
 
+## Netlify + TanStack Start {#netlify}
+
+### Use `[build] base = "web"` in repo-root `netlify.toml`
+
+The official pattern is a **`netlify.toml` at the repository root** with:
+
+```toml
+[build]
+  base = "web"
+  command = "npm ci && npm run build"
+  publish = "dist/client"
+```
+
+Here **`publish`** is relative to **`base`**, so the deployed folder is **`web/dist/client`**. Setting **`publish = "web/dist/client"`** alongside **`base = "web"`** is wrong — Netlify resolves **`web/web/dist/client`**.
+
+### Do not ship with only `npm --prefix web` from repo root
+
+Running **`npm ci --prefix web && npm run build --prefix web`** from the repo root **without** **`[build] base`** can produce **`web/dist/client`** on disk but fail to attach **`@netlify/vite-plugin-tanstack-start`** output (under **`web/.netlify/`** — SSR serverless handler, redirects). Symptom: deploy “succeeds,” logs may show **`0 new file(s)`** / **`0 new function(s)`**, and the site shows Netlify’s generic **“Page not found”** even though Vite listed **`dist/client`** assets in the log.
+
+**Fix:** use **`[build] base = "web"`** and a normal **`npm ci && npm run build`** in `netlify.toml` (see [templates/netlify.toml](templates/netlify.toml)).
+
+### Never put `netlify.toml` in the Netlify “Build command” field
+
+The dashboard **Build command** is a **shell command**. Any non-empty value **overrides** `netlify.toml`. Typing the literal filename **`netlify.toml`** does not load the file — it runs a bogus command and breaks builds.
+
+### Leave dashboard build fields empty when using `netlify.toml`
+
+Prefer **empty** Build command, Base directory, Package directory, and Publish directory in the UI so the committed file is authoritative. If any field is filled incorrectly, it overrides the file.
+
+### Netlify UI can mirror Base ↔ Package directory
+
+Some users cannot clear **Package directory** while **Base** is set (the UI enforces a `web/` prefix or duplicates values). Rely on **file-based config** at the repo root; see [shipping.md](shipping.md) §2.1.
+
+### Custom domain still 404
+
+If **\*.netlify.app** works but the **apex domain** 404s, check **Domain management** (DNS / Netlify DNS) — not the same class of bug as miswired `publish`/`base`.
+
+---
+
 ## CSS preservation
 
 ### Keep Webflow class names verbatim on JSX

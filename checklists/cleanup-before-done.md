@@ -10,7 +10,7 @@ Do **not** declare the migration done until every item passes.
 
 ## TanStack Start / output path
 
-- [ ] Local `(cd web && npm run build)` produces the **publish directory** referenced in `web/netlify.toml` (often `dist/client` — **verify** with `ls web/dist` after build; Netlify UI **base directory** = `web`).
+- [ ] Local `(cd web && npm run build)` produces the **publish directory** referenced in **repo-root** `netlify.toml` (typically **`[build] base = "web"`** + **`publish = "dist/client"`** — **verify** with `ls web/dist` after build). Prefer **empty** Netlify UI build fields so the file is authoritative.
 - [ ] `@netlify/vite-plugin-tanstack-start` is installed in `web/` and wired in `vite.config.ts` if deploying to Netlify.
 
 ## Bundle hygiene
@@ -83,7 +83,7 @@ Do **not** declare the migration done until every item passes.
 - [ ] Root `package.json` has only proxy scripts, no heavy deps (unless monorepo tooling).
 - [ ] `.cursor/rules/` contains scaffolded rule files from this skill.
 - [ ] Root `README.md` points to `web/` and mentions TanStack Start.
-- [ ] `netlify.toml` `publish` path matches **actual** `web/dist/*` output.
+- [ ] Repo-root `netlify.toml`: **`publish`** (relative to **`[build] base`**) matches **actual** `web/dist/*` output after build — not `web/dist/...` duplicated under `base`.
 
 ## First-run deploy (when shipping)
 

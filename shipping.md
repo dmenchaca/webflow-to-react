@@ -65,11 +65,15 @@ There is **no standard Netlify MCP** in the default Cursor bundle; treat Netlify
 ### 2.1 Recommended path (dashboard)
 
 1. **Netlify** → **Add new site** → **Import an existing project** → **GitHub** → pick the new repo.
-2. Set **build** settings to match TanStack Start (see [playbook § Deploy](playbook.md) and root `netlify.toml`):
-   - **Base directory:** `web` (if the app lives in `web/`)
-   - **Build command:** `npm ci && npm run build` (or `pnpm install --frozen-lockfile && pnpm build`)
-   - **Publish directory:** `web/dist/client` (confirm after one local build — TanStack Start + Netlify plugin usually outputs under `dist/client`; adjust if your build prints a different path)
-3. Deploy. Fix any build errors on Netlify (Node version, env vars).
+2. Prefer **no duplicate settings in the UI**: commit the skill’s root **`netlify.toml`** ([templates/netlify.toml](templates/netlify.toml)) with **`[build] base = "web"`**, **`command`**, and **`publish = "dist/client"`**. Then in **Site configuration → Build & deploy → Build settings**, leave these **empty** so the file wins:
+   - **Build command** — empty (never type `netlify.toml` here; that string is treated as a shell command and overrides the file)
+   - **Base directory** — empty (the file sets `base = "web"`)
+   - **Package directory** — empty unless you use a documented monorepo layout that requires it
+   - **Publish directory** — empty (the file sets `publish` relative to `base`)
+3. If you **must** fill the UI (e.g. older site without file-based config), align with the file: base **`web`**, build **`npm ci && npm run build`**, publish **`dist/client`** (relative to **`web/`**, not `web/dist/client` from repo root unless base is empty).
+4. Deploy. Fix any build errors on Netlify (Node version, env vars).
+
+**UI gotcha:** Some Netlify UIs **mirror** whatever you type in Base directory into Package directory (or force a `web/` prefix on publish). If clearing fields is impossible, rely on **`netlify.toml` at the repo root** and keep UI fields blank after each save when possible.
 
 ### 2.2 CLI path
 
@@ -92,10 +96,13 @@ If `netlify login` fails, use the **dashboard** method in §2.1.
 ## 3. TanStack Start + Netlify build notes
 
 - Install **`@netlify/vite-plugin-tanstack-start`** as devDependency in `web/` and register it in `vite.config.ts` per [TanStack Start hosting docs](https://tanstack.com/start/latest/docs/framework/react/guide/hosting).
-- **Publish directory** is often `dist/client` **relative to `web/`**; from repo root that is **`web/dist/client`**. Always verify with:
+- **Repo-root `netlify.toml` should use `[build] base = "web"`** and **`publish = "dist/client"`** (relative to **`base`**, i.e. **`web/dist/client`** on disk). Do **not** set `publish = "web/dist/client"` in the same file as `base = "web"` — Netlify resolves **`web/web/dist/client`**.
+- **Avoid** relying on **`npm ci --prefix web && npm run build --prefix web`** from the repo root **without** `[build] base` in `netlify.toml`. The plugin writes **`.netlify/`** under **`web/`** when the build runs there; a prefix-only build can upload static assets but leave SSR/functions miswired → Netlify’s generic **“Page not found”** on the live URL.
+- Always verify local output with:
   ```bash
   (cd web && npm run build && ls -la dist)
   ```
+- After deploy, build logs should show the real **`npm ci` / `vite build`**, not a bogus command. See [gotchas.md](gotchas.md) § Netlify for symptoms (404 despite “success”, **0 new functions** when SSR should upload).
 
 ---
 
@@ -103,7 +110,7 @@ If `netlify login` fails, use the **dashboard** method in §2.1.
 
 ```
 Local build OK → git commit → GitHub repo (MCP or gh or manual) → push
-→ Netlify import repo → set base/build/publish → deploy → share URL
+→ Netlify import repo → commit root netlify.toml ([build] base = web) → clear UI overrides → deploy → share URL
 ```
 
 ---
@@ -116,5 +123,7 @@ Local build OK → git commit → GitHub repo (MCP or gh or manual) → push
 | No `gh` CLI | Use GitHub.com “New repository” + `git remote add` + `git push` |
 | Netlify not connected | `netlify login` or dashboard import only |
 | Wrong publish dir | Run local `npm run build` in `web/` and list `dist/` |
+| Build command shows `netlify.toml` or other junk | Clear **Build command** in UI so repo `netlify.toml` applies |
+| 404 after “successful” deploy, `0` new functions | Use `[build] base = "web"` in `netlify.toml`; avoid `--prefix`-only builds (see [gotchas.md](gotchas.md) § Netlify) |
 
 This file is **normative** for the skill’s “ship on first migration” behavior.

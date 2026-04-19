@@ -184,10 +184,14 @@ Root `netlify.toml` — use **`templates/netlify.toml`** in this skill. Typical 
 [build]
   base    = "web"
   command = "npm ci && npm run build"
-  publish = "web/dist/client"
+  publish = "dist/client"
 ```
 
+With **`[build] base = "web"`**, **`publish`** is relative to **`base`** (so on disk that is **`web/dist/client`** from the repo root). Do **not** set `publish = "web/dist/client"` in the same file — that would incorrectly resolve to **`web/web/dist/client`**.
+
 **Always** run `npm run build` locally in `web/` once and confirm the output folder (`dist/client` vs `dist/...`). TanStack Start + Netlify plugin may change paths between versions — adjust `publish` to match **actual** output.
+
+Do **not** ship with only `npm ci --prefix web && npm run build --prefix web` from the repo root **without** `[build] base` in `netlify.toml` — the Netlify Vite plugin needs the build to run with **cwd = `web/`** so SSR/functions under **`.netlify/`** deploy correctly (see [gotchas.md](gotchas.md) § Netlify).
 
 Install `@netlify/vite-plugin-tanstack-start` in `web/` (see §3.3).
 

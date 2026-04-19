@@ -1,0 +1,32 @@
+---
+description: Netlify + TanStack Start — netlify.toml at repo root with [build] base, UI must not override; avoid npm --prefix-only deploys
+globs: "netlify.toml,**/netlify.toml"
+alwaysApply: false
+---
+
+# Netlify + TanStack Start (Webflow migration)
+
+These mistakes were hit on real deploys. Follow **[shipping.md](../shipping.md)** and **[gotchas.md](../gotchas.md) § Netlify**.
+
+## 1. Use repo-root `netlify.toml` with `[build] base = "web"`
+
+- **`command`** and **`publish`** run relative to **`base`** after Netlify `cd`s into `web/`.
+- **`publish = "dist/client"`** — not `web/dist/client` when `base` is already `web` (that would resolve to `web/web/dist/client`).
+
+## 2. Do not deploy with only `npm --prefix web` from repo root
+
+Prefer **`[build] base = "web"`** + `npm ci && npm run build` in the file. The **`@netlify/vite-plugin-tanstack-start`** plugin expects the build to run inside `web/` so **`.netlify/`** (SSR serverless function, redirects) is produced and deployed. A prefix-only build can leave **`dist/client`** on disk but still yield Netlify’s generic **404** (“Page not found”).
+
+## 3. Netlify UI must not override the file
+
+Any non-empty **Build command** in the dashboard **overrides** `netlify.toml`. Never put the literal string **`netlify.toml`** in the Build command field.
+
+**Leave empty in the UI (recommended):** Build command, Base directory, Package directory, Publish directory — so the repo file is authoritative. If you must set the UI, mirror **`templates/netlify.toml`** exactly; do not invent paths.
+
+## 4. Netlify UI quirk (monorepos)
+
+Some UIs **mirror Base directory → Package directory**. If you cannot clear fields, rely on **file-based config** at the repo root and clear overrides after each save if needed.
+
+## 5. Verify deploys
+
+After deploy, logs should show a real **`npm ci` / `vite build`**, not a bogus command. If SSR is used, expect **functions** or plugin output under **`web/.netlify/`** during build — not necessarily `netlify/functions` at repo root unless you added that layout.

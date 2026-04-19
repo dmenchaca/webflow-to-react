@@ -1,11 +1,22 @@
-# TanStack Start app in /web; Webflow export stays at repo root (read-only).
+# TanStack Start app in web/; Webflow export stays at repo root (read-only).
 # Install @netlify/vite-plugin-tanstack-start in web/ — see TanStack Start hosting docs.
 #
-# After first local build, confirm output path:
-#   (cd web && npm run build && ls dist)
-# If publish path differs, fix `publish` below (common: dist/client).
+# Why [build] base = "web" (do NOT rely on "npm --prefix web" from repo root only):
+# The Netlify Vite plugin must run with cwd = web/ so .netlify/ (SSR function, redirects)
+# is generated and attached to the deploy. Building from repo root with only --prefix
+# can upload dist/client but still show Netlify's generic "Page not found" (SSR not wired).
 #
+# Paths in this file are relative to [build].base (except base itself = repo-relative).
+#
+# After first local build, confirm output:
+#   (cd web && npm run build && ls dist)
+# Common publish: dist/client — adjust if your build prints a different path.
+
 [build]
   base = "web"
   command = "npm ci && npm run build"
-  publish = "web/dist/client"
+  publish = "dist/client"
+
+[dev]
+  command = "npm run dev"
+  port = 3000
