@@ -49,6 +49,7 @@ export default defineConfig({
       //   'react-property',
       //   'style-to-js',
       //   'style-to-object',
+      //   'inline-style-parser',
       // Leave EMPTY for sites that never trigger the crash. The list is
       // additive and per-site; do not paste another project's config here.
     ],

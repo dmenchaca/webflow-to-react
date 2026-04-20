@@ -145,7 +145,7 @@ This imports the same function entry Netlify will run, through the same Node loa
 **What not to do.**
 
 - Do **not** patch `node_modules` or hand-edit the function output.
-- Do **not** assume which package is at fault on a new site — exports differ per Webflow project (one site uses `gsap`, another adds `html-react-parser`, another a CMS SDK). The list below is **observed examples**, not a default config: `gsap`, `html-react-parser`, `html-dom-parser`, `domhandler`, `react-property`, `style-to-js`, `style-to-object`. Add only what the **current site's** stack trace and smoke test demand.
+- Do **not** assume which package is at fault on a new site — exports differ per Webflow project (one site uses `gsap`, another adds `html-react-parser`, another a CMS SDK). The list below is **observed examples**, not a default config: `gsap`, `html-react-parser`, `html-dom-parser`, `domhandler`, `react-property`, `style-to-js`, `style-to-object`, `inline-style-parser`. Add only what the **current site's** stack trace and smoke test demand.
 - A third failure mode: **`Cannot find module '<pkg>'`** with `Require stack` pointing at `server.mjs` — Netlify’s dependency trace did not copy a **transitive** package into the function bundle. Treat it like `noExternal`: add `<pkg>` to **`ssr.noExternal`**, rebuild, rerun the SSR smoke test.
 - If a dep is genuinely browser-only (e.g. a canvas/Rive runtime), the better fix is to **dynamic-import it inside a client effect** rather than bundling it into the server chunk — see § *Browser-only code must not run on the server*.
 
