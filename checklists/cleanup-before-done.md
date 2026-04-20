@@ -10,7 +10,8 @@ Do **not** declare the migration done until every item passes.
 
 ## TanStack Start / output path
 
-- [ ] Local `(cd web && npm run build)` produces the **publish directory** referenced in **repo-root** `netlify.toml` (typically **`[build] base = "web"`** + **`publish = "dist/client"`** — **verify** with `ls web/dist` after build). Prefer **empty** Netlify UI build fields so the file is authoritative.
+- [ ] Local `(cd web && npm run build)` produces the **publish directory** referenced in **repo-root** `netlify.toml` (typically **`[build] base = "web"`** + **`publish = "dist/client"`** — **verify** with `ls web/dist` after build).
+- [ ] **Netlify → Build settings: all overrides cleared (mission critical).** **Runtime, Base directory, Package directory, Build command, Publish directory,** and **Functions directory** must be **empty / Not set** — especially **not** `netlify/functions` and **not** Base = `/` or `web`. Only **repo-root `netlify.toml`** should define the build. Re-open settings after save. See [gotchas.md](../gotchas.md) § *Mission critical: Netlify UI*.
 - [ ] `@netlify/vite-plugin-tanstack-start` is installed in `web/` and wired in `vite.config.ts` if deploying to Netlify.
 - [ ] **`web/netlify.toml`** exists (from [templates/web-netlify.toml](../templates/web-netlify.toml)) so local **`vite dev`** works with the Netlify Vite plugin (`repositoryRoot` = `web/`).
 - [ ] **SSR smoke test passes** before pushing — `vite build` is not a runtime check:

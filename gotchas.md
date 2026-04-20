@@ -207,9 +207,24 @@ Running **`npm ci --prefix web && npm run build --prefix web`** from the repo ro
 
 The dashboard **Build command** is a **shell command**. Any non-empty value **overrides** `netlify.toml`. Typing the literal filename **`netlify.toml`** does not load the file — it runs a bogus command and breaks builds.
 
-### Leave dashboard build fields empty when using `netlify.toml`
+### Mission critical: Netlify UI build settings must stay empty {#netlify-ui-empty}
 
-Prefer **empty** Build command, Base directory, Package directory, and Publish directory in the UI so the committed file is authoritative. If any field is filled incorrectly, it overrides the file.
+**Non-negotiable for TanStack Start + `@netlify/vite-plugin-tanstack-start`:** After you link the Git repo, open **Site configuration → Build & deploy → Build settings** (sometimes **Configure builds**). **Every override the UI allows must be cleared** so the **repo-root `netlify.toml`** is the **only** source of truth. If **any** of these fields is set in the dashboard, Netlify may **ignore or fight** the TOML — you get “successful” deploys with **wrong publish roots**, **missing SSR functions**, **404s**, or **stale `netlify/functions`** layouts.
+
+**Clear / leave “Not set” (verify after every UI visit — Netlify sometimes re-fills defaults):**
+
+| UI field | Why it must be empty |
+|----------|------------------------|
+| **Runtime** | Let the build use the project’s Node from `netlify.toml` / default unless you have a documented exception. |
+| **Base directory** | Must **not** be `/`, `web`, or anything else here when using **`[build] base = "web"`** in the file — dashboard **Base** overrides or duplicates the monorepo root and breaks the mental model (`web/web`, wrong `cwd`, wrong artifact paths). |
+| **Package directory** | Empty. Only monorepo docs that explicitly require it are an exception. |
+| **Build command** | Empty. A non-empty value **replaces** `netlify.toml`’s `command` — including the useless mistake of typing **`netlify.toml`** as the command. |
+| **Publish directory** | Empty. A wrong value → static files from the wrong folder or **Page not found** while `dist/client` exists elsewhere. |
+| **Functions directory** | Empty / **not** `netlify/functions`. This stack’s SSR handler is emitted by the Vite plugin under **`web/.netlify/`** during **`npm run build`** in `web/`. A legacy **`netlify/functions`** path makes Netlify watch the **wrong tree** — functions never attach, SSR routes crash or 404. |
+
+**Agent / user checklist:** Click **Configure**, clear overrides, **Save**, open **Build settings** again and confirm nothing came back. Treat “I only changed one field” as a **deploy risk**.
+
+See **[shipping.md](shipping.md) §2.1** for the same rule in the ship flow.
 
 ### Netlify UI can mirror Base ↔ Package directory
 

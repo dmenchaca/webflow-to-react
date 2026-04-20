@@ -189,6 +189,8 @@ Root `netlify.toml` — use **`templates/netlify.toml`** in this skill. Typical 
 
 With **`[build] base = "web"`**, **`publish`** is relative to **`base`** (so on disk that is **`web/dist/client`** from the repo root). Do **not** set `publish = "web/dist/client"` in the same file — that would incorrectly resolve to **`web/web/dist/client`**.
 
+**Mission critical — Netlify dashboard:** In **Build & deploy → Build settings**, leave **Runtime, Base directory, Package directory, Build command, Publish directory,** and **Functions directory** **empty / Not set**. Filled UI fields **override `netlify.toml`** and routinely cause **404s**, **missing SSR functions**, or **`netlify/functions`** mismatches. See [gotchas.md](gotchas.md) § *Mission critical: Netlify UI*.
+
 **Always** run `npm run build` locally in `web/` once and confirm the output folder (`dist/client` vs `dist/...`). TanStack Start + Netlify plugin may change paths between versions — adjust `publish` to match **actual** output.
 
 Do **not** ship with only `npm ci --prefix web && npm run build --prefix web` from the repo root **without** `[build] base` in `netlify.toml` — the Netlify Vite plugin needs the build to run with **cwd = `web/`** so SSR/functions under **`.netlify/`** deploy correctly (see [gotchas.md](gotchas.md) § Netlify).
@@ -217,7 +219,7 @@ Details and limits (e.g. render-blocking CSS): [gotchas.md](gotchas.md) § Core 
 1. Follow **[shipping.md](shipping.md)** end-to-end.
 2. Prefer **GitHub MCP** `create_repository` + `git push`.
 3. If MCP auth fails, use `gh auth login` or manual repo creation — **do not** block silently.
-4. Connect **Netlify** to the GitHub repo (dashboard or `netlify login` + `netlify init`).
+4. Connect **Netlify** to the GitHub repo (dashboard or `netlify login` + `netlify init`). **Clear all Build settings overrides** in the Netlify UI — see §9 / [gotchas.md](gotchas.md) § *Mission critical: Netlify UI*.
 5. Share the Netlify URL with the user.
 
 ## 11. Scaffold rules into the new project

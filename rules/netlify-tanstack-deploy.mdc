@@ -1,12 +1,12 @@
 ---
-description: Netlify + TanStack Start — netlify.toml at repo root with [build] base, UI must not override; avoid npm --prefix-only deploys
+description: Netlify + TanStack Start — netlify.toml at repo root with [build] base; MISSION CRITICAL — dashboard Build settings (Base, Publish, Build command, Functions directory, etc.) must stay empty or deploys break
 globs: "netlify.toml,**/netlify.toml"
 alwaysApply: false
 ---
 
 # Netlify + TanStack Start (Webflow migration)
 
-These mistakes were hit on real deploys. Follow **[shipping.md](../shipping.md)** and **[gotchas.md](../gotchas.md) § Netlify**.
+These mistakes were hit on real deploys. Follow **[shipping.md](../shipping.md)** and **[gotchas.md](../gotchas.md) § Netlify** — especially **§ *Mission critical: Netlify UI build settings must stay empty***.
 
 ## 1. Use repo-root `netlify.toml` with `[build] base = "web"`
 
@@ -17,11 +17,20 @@ These mistakes were hit on real deploys. Follow **[shipping.md](../shipping.md)*
 
 Prefer **`[build] base = "web"`** + `npm ci && npm run build` in the file. The **`@netlify/vite-plugin-tanstack-start`** plugin expects the build to run inside `web/` so **`.netlify/`** (SSR serverless function, redirects) is produced and deployed. A prefix-only build can leave **`dist/client`** on disk but still yield Netlify’s generic **404** (“Page not found”).
 
-## 3. Netlify UI must not override the file
+## 3. Mission critical: Netlify UI Build settings must stay empty
 
-Any non-empty **Build command** in the dashboard **overrides** `netlify.toml`. Never put the literal string **`netlify.toml`** in the Build command field.
+**Do not fill** Site configuration → Build & deploy → Build settings (Configure builds). **Every** override risks a broken deploy:
 
-**Leave empty in the UI (recommended):** Build command, Base directory, Package directory, Publish directory — so the repo file is authoritative. If you must set the UI, mirror **`templates/netlify.toml`** exactly; do not invent paths.
+- **Base directory** — empty (not `/`, not `web`); **`[build] base = "web"`** in the file already `cd`s into `web/`.
+- **Build command** — empty; non-empty **replaces** TOML `command`. Never type **`netlify.toml`** here.
+- **Publish directory** — empty; TOML **`publish = "dist/client"`** is relative to `base`.
+- **Package directory** — empty unless a documented monorepo exception.
+- **Functions directory** — empty; **not** `netlify/functions`. SSR functions come from **`web/.netlify/`** after **`vite build`**, not repo-root `netlify/functions`.
+- **Runtime** — leave default / unset unless you have a documented Node pin in TOML.
+
+Re-check the UI **after Save** — Netlify sometimes restores **Functions directory** or Base. Full table: **[gotchas.md](../gotchas.md) § *Mission critical: Netlify UI***.
+
+If you truly cannot clear a field, mirror **`templates/netlify.toml`** exactly — the skill’s default is **file-only + empty UI**.
 
 ## 4. Netlify UI quirk (monorepos)
 

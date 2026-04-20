@@ -1,6 +1,12 @@
 # Production / CI — repository root. For local `vite dev`, also add **`web/netlify.toml`**
 # from templates/web-netlify.toml (Netlify Vite plugin uses `web/` as config root).
 #
+# MISSION CRITICAL — Netlify dashboard: Site configuration → Build & deploy → Build settings.
+# Leave Runtime, Base directory, Package directory, Build command, Publish directory, and
+# Functions directory EMPTY (Not set). UI overrides break deploys (404, missing SSR functions).
+# Do NOT set Functions directory to netlify/functions — SSR uses web/.netlify/ from vite build.
+# See gotchas.md § "Mission critical: Netlify UI" and shipping.md §2.1.
+#
 # TanStack Start app in web/; Webflow export stays at repo root (read-only).
 # Install @netlify/vite-plugin-tanstack-start in web/ — see TanStack Start hosting docs.
 #

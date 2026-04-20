@@ -64,16 +64,21 @@ There is **no standard Netlify MCP** in the default Cursor bundle; treat Netlify
 
 ### 2.1 Recommended path (dashboard)
 
-1. **Netlify** → **Add new site** → **Import an existing project** → **GitHub** → pick the new repo.
-2. Prefer **no duplicate settings in the UI**: commit the skill’s root **`netlify.toml`** ([templates/netlify.toml](templates/netlify.toml)) with **`[build] base = "web"`**, **`command`**, and **`publish = "dist/client"`**. Then in **Site configuration → Build & deploy → Build settings**, leave these **empty** so the file wins:
-   - **Build command** — empty (never type `netlify.toml` here; that string is treated as a shell command and overrides the file)
-   - **Base directory** — empty (the file sets `base = "web"`)
-   - **Package directory** — empty unless you use a documented monorepo layout that requires it
-   - **Publish directory** — empty (the file sets `publish` relative to `base`)
-3. If you **must** fill the UI (e.g. older site without file-based config), align with the file: base **`web`**, build **`npm ci && npm run build`**, publish **`dist/client`** (relative to **`web/`**, not `web/dist/client` from repo root unless base is empty).
-4. Deploy. Fix any build errors on Netlify (Node version, env vars).
+**Mission critical — Netlify UI must not override `netlify.toml`.** Any filled **Build settings** field can **override or corrupt** the deploy (wrong folder, **0 functions**, SSR **404**, “successful” builds that serve nothing). **Clear every field** in **Site configuration → Build & deploy → Build settings** (or **Configure builds**) so **only** the committed repo-root **`netlify.toml`** controls **base**, **command**, **publish**, and **functions**. Re-open the page after **Save** and confirm Netlify did not restore defaults (e.g. **`netlify/functions`**, **Base `/`**).
 
-**UI gotcha:** Some Netlify UIs **mirror** whatever you type in Base directory into Package directory (or force a `web/` prefix on publish). If clearing fields is impossible, rely on **`netlify.toml` at the repo root** and keep UI fields blank after each save when possible.
+1. **Netlify** → **Add new site** → **Import an existing project** → **GitHub** → pick the new repo.
+2. Commit the skill’s root **`netlify.toml`** ([templates/netlify.toml](templates/netlify.toml)) with **`[build] base = "web"`**, **`command = "npm ci && npm run build"`**, and **`publish = "dist/client"`**.
+3. In **Build settings**, leave **all** of these **empty / Not set** (see [gotchas.md](gotchas.md) § *Mission critical: Netlify UI* for the full table):
+   - **Runtime**
+   - **Base directory** — not `/`, not `web` (the TOML already sets `base = "web"`)
+   - **Package directory**
+   - **Build command** — never type `netlify.toml` here; that runs as a shell command and breaks the build
+   - **Publish directory**
+   - **Functions directory** — **must not** be `netlify/functions`; SSR comes from **`web/.netlify/`** after `vite build` inside `web/`
+4. If you **must** fill the UI (rare, undocumented), mirror the TOML exactly — but the skill’s default is **file-only config** with **empty UI**.
+5. Deploy. Fix any build errors on Netlify (Node version, env vars).
+
+**UI gotcha:** Some Netlify UIs **mirror** Base directory into Package directory (or force a `web/` prefix on publish). If a field cannot be cleared, use **Configure** again after save or ask support — **do not** “just set Publish to `web/dist/client` from repo root” while **`[build] base = "web"`** is in the file (that becomes **`web/web/dist/client`**).
 
 ### 2.2 CLI path
 
@@ -131,7 +136,8 @@ Local build OK → git commit → GitHub repo (MCP or gh or manual) → push
 | No `gh` CLI | Use GitHub.com “New repository” + `git remote add` + `git push` |
 | Netlify not connected | `netlify login` or dashboard import only |
 | Wrong publish dir | Run local `npm run build` in `web/` and list `dist/` |
-| Build command shows `netlify.toml` or other junk | Clear **Build command** in UI so repo `netlify.toml` applies |
+| Build command shows `netlify.toml` or other junk | Clear **all** Build settings overrides (Build command, Base, Publish, **Functions directory**) so repo `netlify.toml` applies — see [gotchas.md](gotchas.md) § *Mission critical: Netlify UI* |
+| **Functions directory** set to `netlify/functions` | **Clear it.** TanStack Start uses the plugin’s **`web/.netlify/`** output, not repo-root `netlify/functions` |
 | 404 after “successful” deploy, `0` new functions | Use `[build] base = "web"` in `netlify.toml`; avoid `--prefix`-only builds (see [gotchas.md](gotchas.md) § Netlify) |
 | `vite dev` error: Base directory `…/web/web` does not exist | Add **`web/netlify.toml`** from [templates/web-netlify.toml](templates/web-netlify.toml) |
 | Netlify function crash: `Cannot use import statement outside a module` / `ERR_REQUIRE_ESM` | Add the package named in the stack trace to **`ssr.noExternal`** in `web/vite.config.ts`; rerun the SSR smoke test ([gotchas.md](gotchas.md) § SSR / [templates/vite-ssr-noexternal.example.ts](templates/vite-ssr-noexternal.example.ts)) |

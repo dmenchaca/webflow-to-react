@@ -16,7 +16,7 @@ description: >-
 
 Turns a Webflow HTML export into a **TanStack Start** app (SSR + file-based routing via TanStack Router) with **pixel parity from day one**, then progressive refactors. Strategy: **copy CSS verbatim, wrap HTML in JSX, keep GSAP in client boundaries, replace jQuery/webflow.js with hooks**.
 
-**First-time migration ship:** If this is the **first** conversion of that site, the agent should **ship to a new private GitHub repo** (prefer **GitHub MCP** `create_repository`) and **connect Netlify** to that repo with the correct build/publish settings. Users may not be logged in — follow **[shipping.md](shipping.md)** for MCP failures and `gh` / dashboard fallbacks.
+**First-time migration ship:** If this is the **first** conversion of that site, the agent should **ship to a new private GitHub repo** (prefer **GitHub MCP** `create_repository`) and **connect Netlify** to that repo. **Mission critical:** In the Netlify dashboard **Build settings**, **every** field (**Runtime, Base directory, Package directory, Build command, Publish directory, Functions directory**) must stay **empty / Not set** so **only** repo-root **`netlify.toml`** controls the build — any filled UI field causes **real deploy failures** (404, missing SSR functions, wrong paths). See **[gotchas.md](gotchas.md) § *Mission critical: Netlify UI*** and **[shipping.md](shipping.md) §2.1**. Users may not be logged in — follow **[shipping.md](shipping.md)** for MCP failures and `gh` / dashboard fallbacks.
 
 ## When to use this skill
 
@@ -47,7 +47,7 @@ Migration progress:
 - [ ] 13b. **Optional CWV:** `web/netlify.toml` from [templates/web-netlify.toml](templates/web-netlify.toml); font preloads / deferred third-party scripts / hero image priorities per [gotchas.md](gotchas.md) § Core Web Vitals
 - [ ] 14. Scaffold .cursor/rules/* into the new project (see rules/)
 - [ ] 15. **SSR import smoke test** before pushing — `vite build` is not a runtime check; see [gotchas.md](gotchas.md) § *Netlify SSR function crashes on first request* and [templates/vite-ssr-noexternal.example.ts](templates/vite-ssr-noexternal.example.ts). Per-site list, do not copy verbatim from another project.
-- [ ] 16. First-run ship: GitHub repo + Netlify — see shipping.md
+- [ ] 16. First-run ship: GitHub repo + Netlify — see shipping.md; **verify Netlify Build settings are all empty** (gotchas § Mission critical: Netlify UI)
 - [ ] 17. Open the live URL after deploy — Netlify “build success” does not exercise the function
 - [ ] 18. Run cleanup checklist (checklists/cleanup-before-done.md)
 ```
