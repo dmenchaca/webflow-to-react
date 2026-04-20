@@ -1,43 +1,53 @@
-# webflow-to-react (Cursor agent skill)
+# webflow-to-react (agent skill)
 
-**Webflow HTML export → TanStack Start (React + SSR)** — playbook, checklists, Cursor rules, and templates for pixel-parity migrations.
+**Webflow HTML export → TanStack Start (React + SSR)** — playbook, checklists, portable rules, and templates for pixel-parity migrations. Use with **Cursor, Claude Code, GitHub Copilot, Gemini, Codex**, or any assistant that reads Markdown skills and project instructions.
 
-## Use in Cursor
+## Install
 
-### Option A — clone into your machine
+Clone or copy this repo wherever your tool loads skills or long-lived instructions (check that product’s docs for the exact path).
+
+### Examples
+
+| Tool | Typical location |
+|------|------------------|
+| **Cursor** | `~/.cursor/skills/webflow-to-react` or project `.cursor/skills/` |
+| **Claude Code / Claude** | `~/.claude/skills/webflow-to-react` (or project-local skills per docs) |
+| **Others** | Project `AGENTS.md`, `.github/copilot-instructions.md`, or vendor-specific skill folders |
+
+**Cursor — clone:**
 
 ```bash
 git clone git@github.com:dmenchaca/webflow-to-react.git ~/.cursor/skills/webflow-to-react
 ```
 
-Restart Cursor or start a new chat. The agent can read `SKILL.md` when you `@`-mention it or ask to migrate a Webflow export.
+Restart the IDE or start a new session. Load `SKILL.md` via `@` mention or by asking to migrate a Webflow export.
 
-### Option B — copy into a single project
+**Single project copy:**
 
 ```bash
 mkdir -p .cursor/skills
-cp -R /path/to/clone/webflow-to-react .cursor/skills/
+cp -R /path/to/webflow-to-react .cursor/skills/
 ```
 
 ### Rules (recommended)
 
-Copy the `.mdc` rules into the project you are migrating:
+`rules/*.mdc` are Markdown rules (fonts, CSS, GSAP, Netlify, CWV). **Cursor:** copy into `.cursor/rules/`. **Other agents:** merge the same content into your project’s agent-instructions file so every tool enforces the same constraints.
 
 ```bash
 mkdir -p .cursor/rules
-cp ./rules/*.mdc .cursor/rules/   # from repo root after clone
+cp ./rules/*.mdc .cursor/rules/   # from repo root; Cursor
 ```
 
 ## Contents
 
 | Path | Purpose |
 |------|---------|
-| `SKILL.md` | Entry point — workflow, stack, when to use |
+| `SKILL.md` | Entry point — workflow, stack, when to use, multi-agent notes |
 | `playbook.md` | Bootstrap order, TanStack layout, deploy |
 | `gotchas.md` | Fonts, SSR, GSAP, widgets, head/meta |
 | `shipping.md` | First-run GitHub + Netlify |
 | `checklists/` | Pre-migration + cleanup ship gate |
-| `rules/` | Cursor rules (fonts, CSS, GSAP, widgets) |
+| `rules/` | Portable rules (fonts, CSS, GSAP, widgets, Netlify) |
 | `templates/` | Snippets (netlify, fonts barrel, `MarketingSiteRoot`, …) |
 
 ## License
