@@ -21,6 +21,14 @@ Do **not** declare the migration done until every item passes.
   If it fails with `Cannot use import statement outside a module` or `ERR_REQUIRE_ESM`, add the package named in the stack to **`ssr.noExternal`** in `web/vite.config.ts` (see [gotchas.md](../gotchas.md) § SSR / [templates/vite-ssr-noexternal.example.ts](../templates/vite-ssr-noexternal.example.ts)) and rerun.
 - [ ] **After deploy, open the live URL** and confirm the SSR function renders the page (Netlify “build success” does not exercise the function).
 
+## Post-deploy HTML verification
+
+- [ ] Fetch production HTML once — SSR can fail silently with a client fallback while the deploy stays green:
+  ```bash
+  curl -sS 'https://YOUR_SITE.netlify.app/' | tr -d '\0' | grep -E '<title>|Switched to client rendering|data-msg='
+  ```
+  Expect a real **`<title>…</title>`** and **no** `Switched to client rendering`. If you see the fallback, fix the function error (often `ssr.noExternal` — [gotchas.md](../gotchas.md) § SSR) and redeploy.
+
 ## Optional Core Web Vitals (if optimizing Lighthouse)
 
 - [ ] **Font preloads** in root `head()` only for **above-the-fold** `woff2` files listed in `site-fonts.css` — see [gotchas.md](../gotchas.md) § Core Web Vitals.
@@ -55,11 +63,22 @@ Do **not** declare the migration done until every item passes.
 
 ## HTML shell / meta
 
-- [ ] Root HTML shell (TanStack Start entry / route head) has the right `<title>` and description.
+- [ ] Root HTML shell (TanStack Start entry / route head) has the right `<title>` and description — values from **[templates/site-seo.example.ts](../templates/site-seo.example.ts)** / `web/src/site/seo.ts`.
+- [ ] **`head()` includes `{ title: siteSeo.title }` inside the `meta` array** (not a top-level `title` key — that produces **no** `<title>` in SSR HTML). See [gotchas.md](../gotchas.md) § *The export’s `<head>`*.
 - [ ] `<meta name="generator">` is **not** `Webflow` — use something accurate (`TanStack Start`, `Vite + React`, etc.).
 - [ ] OG/Twitter meta tags match the original site.
 - [ ] Agreed analytics behavior matches the export + user (removed, replaced, or kept per brief); **no extra** GTM/GA/Hotjar unless requested.
 - [ ] Favicon + webclip resolve.
+
+## Webflow interactivity audit
+
+Required when the page body came from **`html-react-parser` / raw HTML** or any path that **drops `webflow.js`** while keeping **`w-*`** classes and **`data-w-id`**. See [gotchas.md](../gotchas.md) § *Raw `html-react-parser`*, § *Webflow `webflow.js` behaviors*.
+
+- [ ] **Navbar scroll states:** if the export has a **fixed** bar (e.g. `.hidden-nav` + `translate(0,-100%)`) and a **second** `w-nav` in the hero (`#hero-nav` / `is-no-bottom-border`), top-of-page vs scrolled visuals match Webflow (white bar slides in; hero overlay hides).
+- [ ] **Mobile `w-nav`:** hamburger toggles menu (`w--open`, `data-nav-menu-open`); in-page `#` links close the menu.
+- [ ] **`w-dropdown`:** opens/closes like the export (hover vs click per `data-hover`).
+- [ ] **Scan the export** for `w-tabs`, `w-slider`, `w-lightbox`, `w-form`, **`fs-*`** — each works, was reimplemented, or was removed on purpose.
+- [ ] **IX2 `<style>` pre-states** in the export `<head>` (`html.w-mod-js:not(.w-mod-ix) [data-w-id="…"]`) — initial layout matches production after removing IX2 (adjust CSS or add compensating JS).
 
 ## Sections coverage
 

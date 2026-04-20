@@ -14,6 +14,7 @@ The Netlify function crash page shows one of:
 
 - `SyntaxError: Cannot use import statement outside a module` with `node:internal/modules/cjs/loader` in the stack — Node tried to load an ESM-only file (e.g. `node_modules/<pkg>/index.js`) through the CommonJS loader.
 - `Error [ERR_REQUIRE_ESM]: require() of ES Module …` — a CJS file inside a package called `require()` on an ESM-only sibling.
+- `Error: Cannot find module '<pkg>'` with `Require stack` → `server.mjs` — Netlify did not trace a **transitive** dependency into the function bundle. Add `<pkg>` to **`ssr.noExternal`** (same as ESM fixes).
 
 The first stack frame names the file: `/var/task/node_modules/<pkg>/<file>`. **`<pkg>` is what you add.**
 

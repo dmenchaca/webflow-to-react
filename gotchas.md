@@ -69,7 +69,25 @@ Import the Webflow marketing CSS barrel from **`routes/__root.tsx`** (or equival
 
 TanStack Start controls the document via **`src/routes/__root.tsx`** `head()` (and the shell component), **not** a checked-in `web/index.html`. The Webflow **`index.html`** `<title>`, **description**, **Open Graph / Twitter** tags, **favicon / apple-touch-icon** links, **theme-color**, and **analytics** (`<script defer …>`) must be **ported explicitly** into the root route — otherwise they silently disappear while `public/images/favicon.png` still exists on disk.
 
-**Fix:** During migration, copy `<head>` contents into a small module (e.g. `web/src/site/seo.ts`) and return them from `createRootRoute({ head: () => ({ meta: [...], links: [...] }) })`. Use **absolute URLs** for `og:image` / `twitter:image` (prefix with `https://your-domain`). Re-read the export’s `index.html` before calling the migration done — see [checklists/cleanup-before-done.md](checklists/cleanup-before-done.md) § HTML shell / meta.
+**Fix:** During migration, copy `<head>` contents into a small module (e.g. `web/src/site/seo.ts` — see [templates/site-seo.example.ts](templates/site-seo.example.ts)) and return them from `createRootRoute({ head: () => ({ meta: [...], links: [...] }) })`.
+
+**TanStack Router `head()` shape — `<title>` is not a top-level key.** Only `meta`, `links`, `scripts`, and `styles` from the object returned by `head()` are read into the match. A top-level `title: '…'` is **silently ignored** — there will be no `<title>` in SSR HTML. Put the document title in the **`meta` array** as `{ title: '…' }` (conventionally **last** in the array so it wins when multiple routes merge head). Example:
+
+```ts
+head: () => ({
+  meta: [
+    { charSet: 'utf-8' },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { name: 'description', content: siteSeo.description },
+    { property: 'og:title', content: siteSeo.ogTitle },
+    // …
+    { title: siteSeo.title },
+  ],
+  links: [/* … */],
+})
+```
+
+Use **absolute URLs** for `og:image` / `twitter:image` (prefix with `https://your-domain`). Re-read the export’s `index.html` before calling the migration done — see [checklists/cleanup-before-done.md](checklists/cleanup-before-done.md) § HTML shell / meta.
 
 ### `useTouchClass` and similar
 
@@ -127,8 +145,40 @@ This imports the same function entry Netlify will run, through the same Node loa
 **What not to do.**
 
 - Do **not** patch `node_modules` or hand-edit the function output.
-- Do **not** assume which package is at fault on a new site — exports differ per Webflow project (one site uses `gsap`, another adds `html-react-parser`, another a CMS SDK). The list below is **observed examples**, not a default config: `gsap`, `html-react-parser`, `html-dom-parser`, `domhandler`, `react-property`, `style-to-js`. Add only what the **current site's** stack trace and smoke test demand.
+- Do **not** assume which package is at fault on a new site — exports differ per Webflow project (one site uses `gsap`, another adds `html-react-parser`, another a CMS SDK). The list below is **observed examples**, not a default config: `gsap`, `html-react-parser`, `html-dom-parser`, `domhandler`, `react-property`, `style-to-js`, `style-to-object`. Add only what the **current site's** stack trace and smoke test demand.
+- A third failure mode: **`Cannot find module '<pkg>'`** with `Require stack` pointing at `server.mjs` — Netlify’s dependency trace did not copy a **transitive** package into the function bundle. Treat it like `noExternal`: add `<pkg>` to **`ssr.noExternal`**, rebuild, rerun the SSR smoke test.
 - If a dep is genuinely browser-only (e.g. a canvas/Rive runtime), the better fix is to **dynamic-import it inside a client effect** rather than bundling it into the server chunk — see § *Browser-only code must not run on the server*.
+
+### Raw `html-react-parser` / string HTML is a foot-gun {#html-react-parser-footgun}
+
+Dumping the export body into a string and `parse(html)` preserves **every** Webflow class and **`data-w-id`**, but **`webflow.js` is gone** — so **Interactions 2.0**, **navbar component JS**, **dropdown / tabs / slider / lightbox** behaviors, and **Finsweet** (`fs-*` attributes) do **not** run. There is often **no build error**; the page just renders the wrong visual or interactive state.
+
+**Mandatory follow-up after a `parse(html)` pass:** run the **interactivity audit** in [checklists/cleanup-before-done.md](checklists/cleanup-before-done.md) § *Webflow interactivity audit*.
+
+### Webflow `webflow.js` behaviors that silently break {#webflow-runtime-lost}
+
+These are **site-specific** in markup, but the **failure mode** is the same on every export once `webflow.js` is removed:
+
+| Pattern | Symptom | Fix direction |
+|--------|---------|----------------|
+| **Dual navbar / scroll swap** — e.g. a **fixed** wrapper (often `.hidden-nav` with `transform: translate(0,-100%)`) containing an `is-white` bar, **plus** a second `w-nav` in the hero (`is-no-bottom-border`, e.g. `#hero-nav`) | At top: both visible or wrong bar; on scroll: white bar never slides in | Drive the same CSS states with **`data-navbar-scrolled`** (or a class) on `<html>` from a **`scroll` listener** in `useEffect`, plus CSS `transition` on `transform` / `opacity` — mirror the two Webflow states exactly. |
+| **`w-nav` mobile menu** — `.w-nav-button`, `.w-nav-menu`, `data-collapse` | Hamburger does nothing | Toggle **`w--open`** on the button and **`data-nav-menu-open`** on the menu (see Webflow’s CSS) from a click listener; close on in-page `#` link clicks. |
+| **`w-dropdown`** — `.w-dropdown-toggle`, `.w-dropdown-list.w--open` | Dropdown never opens | `mouseenter` / `mouseleave` on `.w-dropdown` when `data-hover="true"`, else click toggle; match `.w--open` on list + toggle. |
+| **`w-tabs`, `w-slider`, `w-lightbox`, `w-form`** | Tabs, sliders, lightbox, form validation broken | Re-implement with React state or small vanilla controllers; or keep Webflow’s runtime (usually not desired). |
+| **IX2 pre-hide `<style>` in export `<head>`** — selectors like `html.w-mod-js:not(.w-mod-ix) [data-w-id="…"]` | If you add **`w-mod-ix`** globally without IX2, pre-hide rules never apply and **initial states** (opacity, height) differ from production | Either remove/replace those rules after porting the interaction, or reproduce the **end state** of each IX2 timeline in CSS/JS. |
+| **Finsweet** — `fs-scrolldisable-element`, `fs-*` | Attribute has no effect | Load the same Finsweet script the export used, or remove the attribute and implement the behavior in React. |
+
+The skill’s GSAP section correctly says IX2 JSON does not transfer — extend that mentally to **all** `w-*` component JS, not only “scroll animations.”
+
+### Post-deploy HTML verification {#post-deploy-html}
+
+TanStack Start can stream a **fallback** comment (`Switched to client rendering because the server rendering errored`) when SSR throws — the deploy still looks “green.” **Always** fetch the production URL once and check:
+
+```bash
+curl -sS 'https://YOUR_SITE.netlify.app/' | tr -d '\0' | grep -E '<title>|Switched to client rendering|data-msg='
+```
+
+Expect a real `<title>…</title>` and **no** `Switched to client rendering`. See [checklists/cleanup-before-done.md](checklists/cleanup-before-done.md) § *Post-deploy HTML verification*.
 
 ---
 
@@ -258,7 +308,7 @@ Forgetting `ctx.revert()` under StrictMode is the most common failure: you see "
 
 ```ts
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import ScrollTrigger from 'gsap/ScrollTrigger' // default export — named `{ ScrollTrigger }` breaks some SSR bundlers
 gsap.registerPlugin(ScrollTrigger)   // ← top of the file, not inside the component
 ```
 

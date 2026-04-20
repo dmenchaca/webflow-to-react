@@ -106,7 +106,7 @@ The Webflow export’s **`index.html`** is no longer the HTML shell once you use
 - `<link rel="icon">` / **shortcut icon**, **apple-touch-icon** (paths under `public/` stay `/images/...`)
 - Third-party **analytics** (`<script defer …>`), unless the user asked to omit them
 
-Centralize strings in something like **`web/src/site/seo.ts`** and return `meta` / `links` from the root route’s `head()` so SSR and social previews match the old site. See [gotchas.md](gotchas.md) § *The export’s `<head>` does not migrate by itself*.
+Centralize strings in something like **`web/src/site/seo.ts`** ([templates/site-seo.example.ts](templates/site-seo.example.ts)) and return `meta` / `links` from the root route’s `head()` so SSR and social previews match the old site. **`<title>` must be `{ title: siteSeo.title }` inside the `meta` array** — a top-level `title` on the `head()` return object is ignored by TanStack Router. See [gotchas.md](gotchas.md) § *The export’s `<head>` does not migrate by itself*.
 
 Also copy **global `*` rules** from **`css/webflow.css`** (or the `<style>` blocks in the export `index.html`) into your global stylesheet — at minimum **`-webkit-font-smoothing: antialiased`** and **`-moz-osx-font-smoothing: grayscale`**. Webflow relies on these for consistent text weight on macOS; TanStack/Tailwind shells omit them by default. See [gotchas.md](gotchas.md) § *Copy Webflow’s global font-smoothing*.
 

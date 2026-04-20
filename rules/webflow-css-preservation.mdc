@@ -21,6 +21,7 @@ This project migrated from a Webflow HTML export. The fastest path to pixel pari
 - Don't rename class names "to be cleaner" — it breaks parity and makes diffing against the reference impossible.
 - Don't start converting to Tailwind utilities across many sections at once. One section at a time, only after parity is confirmed.
 - Don't delete unused-looking rules from the compiled CSS during migration; Webflow CSS often cross-references many class combos.
+- Don't assume **`html-react-parser` / raw HTML** preserves **behavior** — only structure and styles. **`webflow.js`**, **IX2**, and **`w-*` component JS** still need a port or replacement. See **[gotchas.md](../gotchas.md) § *Raw `html-react-parser`*** and § *Webflow `webflow.js` behaviors*.
 
 ## Progressive refactor path (post-parity)
 

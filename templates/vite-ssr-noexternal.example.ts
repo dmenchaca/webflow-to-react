@@ -46,6 +46,9 @@ export default defineConfig({
       //   'html-react-parser',
       //   'html-dom-parser',
       //   'domhandler',
+      //   'react-property',
+      //   'style-to-js',
+      //   'style-to-object',
       // Leave EMPTY for sites that never trigger the crash. The list is
       // additive and per-site; do not paste another project's config here.
     ],
@@ -61,6 +64,6 @@ export default defineConfig({
 //       process.exit(1) })"
 //
 // If this prints `SSR import OK`, the same module graph will at least start
-// on Netlify. If it throws `Cannot use import statement outside a module` or
-// `ERR_REQUIRE_ESM`, copy the package name from the stack trace into the
-// `noExternal` array above and rerun.
+// on Netlify. If it throws `Cannot use import statement outside a module`,
+// `ERR_REQUIRE_ESM`, or `Cannot find module`, copy the package name from the
+// stack trace into the `noExternal` array above and rerun.

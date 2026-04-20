@@ -69,6 +69,7 @@ Copy/adapt from `templates/`. TanStack Start also generates its own `vite.config
 - `templates/netlify.toml` — production CI (repo root); **`templates/web-netlify.toml`** — local `vite dev` / Netlify plugin root = `web/`
 - `templates/PlausibleLoader.tsx` (example **only if** the project uses Plausible), `templates/site-font-preload.example.ts`, `templates/performance-overrides.example.css` — optional CWV patterns (**adapt per site**)
 - `templates/vite-ssr-noexternal.example.ts` — `web/vite.config.ts` shape with the **`ssr.noExternal`** pattern + local SSR smoke test for Netlify function crashes (**per-site list**, do not paste another project's deps)
+- `templates/site-seo.example.ts` — `web/src/site/seo.ts` + reminder that **`{ title }` belongs inside `head().meta`**, not top-level `head()`
 - `templates/site-fonts.css`, `templates/marketing.css`, `MarketingSiteRoot.tsx` — same ideas as before, paths under `web/src/`
 
 ## Rules to scaffold
