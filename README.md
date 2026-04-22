@@ -33,8 +33,8 @@ An [agent skill](https://agentskills.io/) for turning a **Webflow HTML export** 
 ## Why migrate from Webflow to React
 
 - **Lower hosting cost:** Deploy to [Netlify](https://www.netlify.com/), [Cloudflare](https://pages.cloudflare.com/), or [Vercel](https://vercel.com/). For a typical site, their free tiers are often enough, so you are not paying Webflow to host a static or SSR marketing site.
-- **Agentic editing:** The whole app lives in Git—use agentic coding in your editor or CLI to edit your site on the order of **10x** faster than the Webflow Designer loop alone.
-- **Skills ecosystem:** Stack this skill with others—[Impeccable](https://impeccable.style/) for design polish and critique, and [Motion](https://motion.dev/) (or your Motion / animation skill of choice) to refine motion and interaction without ripping out your GSAP work.
+- **Agentic editing:** Use Cursor, Claude, Antigravity or your agent of choice to edit your site.
+- **Skills ecosystem:** Stack this skill with others like [Impeccable](https://impeccable.style/) for design polish and critique, and [Motion](https://motion.dev/) (or your Motion / animation skill of choice) to refine motion and interactions.
 
 ## What's in the repo
 
