@@ -13,7 +13,27 @@ This repo is a single [Agent Skills](https://agentskills.io/)-style package: a d
 
 ## Installation
 
-### Recommended (global, one copy per machine)
+### Recommended: `npx skills` (one command)
+
+From a project root (or anywhere), install with the [skills](https://www.npmjs.com/package/skills) CLI — same flow as other skills on [skills.sh](https://skills.sh/):
+
+```bash
+npx skills@latest add dmenchaca/webflow-to-react -y
+```
+
+- **Project-local** (default): writes `.agents/skills/webflow-to-react/` and symlinks for supported agents (Cursor, Claude Code, Codex, Gemini CLI, etc.).
+- **Global (one copy per user):** add `-g`:
+  ```bash
+  npx skills@latest add dmenchaca/webflow-to-react -g -y
+  ```
+- **Pick agents explicitly:** e.g. `npx skills@latest add dmenchaca/webflow-to-react --agent cursor claude-code -y`
+- **Non-interactive everything:** `npx skills@latest add dmenchaca/webflow-to-react --all` (installs all skills in the repo with all agents, with prompts skipped)
+
+After install, **reload the IDE or agent** so the skill is picked up. Run `npx skills@latest list` (or `list -g`) to confirm.
+
+---
+
+### Alternative: `git clone` (global, one copy per machine)
 
 Pick **one** block for the tool you use. Each command installs the skill under that tool’s global skills directory so every project can use it.
 
@@ -83,12 +103,14 @@ Copilot does not use the same global “skills folder” layout. Use **always-on
 
 Use this when the skill should only apply to a single project (team shares it via Git).
 
-| Tool | Path (inside your app repo) |
-|------|-------------------------------|
-| Cursor | `.cursor/skills/webflow-to-react/` |
-| Claude Code | `.claude/skills/webflow-to-react/` |
-| Gemini CLI | `.gemini/skills/webflow-to-react/` or `.agents/skills/webflow-to-react/` |
-| Codex CLI | `.agents/skills/webflow-to-react/` (at or above where you run Codex) |
+
+| Tool        | Path (inside your app repo)                                              |
+| ----------- | ------------------------------------------------------------------------ |
+| Cursor      | `.cursor/skills/webflow-to-react/`                                       |
+| Claude Code | `.claude/skills/webflow-to-react/`                                       |
+| Gemini CLI  | `.gemini/skills/webflow-to-react/` or `.agents/skills/webflow-to-react/` |
+| Codex CLI   | `.agents/skills/webflow-to-react/` (at or above where you run Codex)     |
+
 
 **Example (Claude Code layout):**
 
@@ -116,7 +138,7 @@ cp ./rules/*.mdc .cursor/rules/   # run from the webflow-to-react repo root, or 
 ## Usage
 
 - **Implicit:** The YAML **`description`** in `SKILL.md` is written so agents match on phrases like *Webflow export*, *TanStack Start*, *convert Webflow to React*, *SSR*, and *pixel parity*. Ordinary prompts in that vein should pull the skill in where the tool supports skill discovery.
-- **Explicit / attachments:** In IDEs that support it, **`@`-mention** `SKILL.md` (or the `webflow-to-react` skill) in chat to load it. In **Claude Code**, invoke by skill name (see [skills docs](https://docs.anthropic.com/en/docs/claude-code/skills)). In **Codex**, use **`/skills`** or **`$`** skill mentions per [Codex skills](https://developers.openai.com/codex/skills).
+- **Explicit / attachments:** In IDEs that support it, **@-mention** `SKILL.md` (or the `webflow-to-react` skill) in chat to load it. In **Claude Code**, invoke by skill name (see [skills docs](https://docs.anthropic.com/en/docs/claude-code/skills)). In **Codex**, use **`/skills`** or **`$`** skill mentions per [Codex skills](https://developers.openai.com/codex/skills).
 - **Rules:** After copying `rules/*.mdc` into `.cursor/rules/`, those rules apply automatically in Cursor. For Copilot, mirror the same constraints in project instructions.
 - **First run:** Open **`SKILL.md`**, then **`playbook.md`**, then **`shipping.md`** before any deploy step.
 
@@ -124,15 +146,18 @@ cp ./rules/*.mdc .cursor/rules/   # run from the webflow-to-react repo root, or 
 
 ## Contents
 
-| Path | Purpose |
-|------|---------|
-| `SKILL.md` | Entry point — workflow, stack, when to use, multi-agent notes |
-| `playbook.md` | Bootstrap order, TanStack layout, deploy |
-| `gotchas.md` | Fonts, SSR, GSAP, widgets, head/meta |
-| `shipping.md` | First-run GitHub + Netlify |
-| `checklists/` | Pre-migration + cleanup ship gate |
-| `rules/` | Portable rules (fonts, CSS, GSAP, widgets, Netlify) |
-| `templates/` | Snippets (netlify, fonts barrel, `MarketingSiteRoot`, static `sitemap.xml` / `robots.txt` examples, …) |
+
+| Path          | Purpose                                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| `SKILL.md`    | Entry point — workflow, stack, when to use, multi-agent notes                                          |
+| `playbook.md` | Bootstrap order, TanStack layout, deploy                                                               |
+| `gotchas.md`  | Fonts, SSR, GSAP, widgets, head/meta                                                                   |
+| `shipping.md` | First-run GitHub + Netlify                                                                             |
+| `checklists/` | Pre-migration + cleanup ship gate                                                                      |
+| `rules/`      | Portable rules (fonts, CSS, GSAP, widgets, Netlify)                                                    |
+| `templates/`  | Snippets (netlify, fonts barrel, `MarketingSiteRoot`, static `sitemap.xml` / `robots.txt` examples, …) |
+| `LICENSE`     | [MIT](LICENSE)                                                                                         |
+
 
 ---
 
@@ -150,4 +175,4 @@ Skills layout varies by product; this repo follows the common `SKILL.md`-at-root
 
 ## License
 
-Private repository — share only with collaborators you invite on GitHub.
+[MIT](LICENSE) — see the [`LICENSE`](LICENSE) file for full text.
