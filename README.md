@@ -20,6 +20,7 @@
   <a href="#why-migrate-from-webflow-to-react">Why migrate</a> &nbsp;·&nbsp;
   <a href="#whats-in-the-repo">What's in the repo</a> &nbsp;·&nbsp;
   <a href="#installation">Installation</a> &nbsp;·&nbsp;
+  <a href="#example-prompts">Example prompts</a> &nbsp;·&nbsp;
   <a href="#usage">Usage</a> &nbsp;·&nbsp;
   <a href="#license">License</a>
 </p>
@@ -50,15 +51,21 @@ An [agent skill](https://agentskills.io/) for turning a **Webflow HTML export** 
 
 ## Installation
 
-**Recommended** — from your project (or any folder):
-
 ```bash
 npx skills@latest add dmenchaca/webflow-to-react -y
 ```
 
 Install for all projects on this machine: add `-g`. Reload your editor or agent after install.
 
-**Or** clone the repo into your tool's skills directory (global or project). Paths differ by product; [SKILL.md](SKILL.md) calls out common layouts and Copilot-style setups.
+## Example prompts
+
+| Stage | You might say |
+|-------|---------------|
+| **Start here** | *"Convert this Webflow export to **TanStack Start** (React, SSR) with **pixel parity**. Use the **webflow-to-react** skill and follow [SKILL.md](SKILL.md) from step one."* |
+| **Plan the work** | *"Read [playbook.md](playbook.md) and [gotchas.md](gotchas.md) and tell me the top risks for this export—fonts, GSAP, analytics, and anything that will break SSR."* |
+| **Build the app** | *"Scaffold the app under `web/`, keep Webflow CSS class-for-class, port the first route, and keep GSAP in client-only code per the skill—no jQuery or `webflow.js`."* |
+| **First deploy** | *"Follow [shipping.md](shipping.md) for a new private GitHub repo and Netlify. Build settings in the Netlify UI must stay empty; only root `netlify.toml` should drive the build."* |
+| **Polish** | *"Work through [checklists/cleanup-before-done.md](checklists/cleanup-before-done.md) and [gotchas.md](gotchas.md) for CWV, `sitemap.xml` / `robots.txt` if we need them, and any Netlify function / `ssr.noExternal` issues."* |
 
 ## Usage
 
