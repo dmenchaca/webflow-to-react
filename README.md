@@ -1,15 +1,31 @@
-# webflow-to-react (agent skill)
+<p align="center">
+  <img src="https://em-content.zobj.net/source/apple/391/rocket_1f680.png" width="96" alt="" />
+</p>
 
-**Webflow HTML export → TanStack Start (React + SSR)** — playbook, checklists, portable rules, and templates for pixel-parity migrations.
+<h1 align="center">webflow-to-react</h1>
 
-This repo is a single [Agent Skills](https://agentskills.io/)-style package: a directory with **`SKILL.md`** at the root plus linked Markdown, `rules/`, and `templates/`. Install it where your tool discovers skills, or point Copilot-style assistants at the files via project instructions.
+<p align="center">
+  <strong>Webflow export → TanStack Start (React + SSR)</strong><br />
+  <em>Playbook, checklists, rules, and templates for pixel-parity migrations</em>
+</p>
 
-**Default clone URL (replace with your fork if needed):**
+<p align="center">
+  <a href="https://github.com/dmenchaca/webflow-to-react/stargazers"><img src="https://img.shields.io/github/stars/dmenchaca/webflow-to-react?style=flat&color=yellow" alt="Stars" /></a>
+  <a href="https://github.com/dmenchaca/webflow-to-react/commits/main"><img src="https://img.shields.io/github/last-commit/dmenchaca/webflow-to-react?style=flat" alt="Last commit" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/dmenchaca/webflow-to-react?style=flat" alt="License" /></a>
+</p>
 
-- SSH: `git@github.com:dmenchaca/webflow-to-react.git`
-- HTTPS: `https://github.com/dmenchaca/webflow-to-react.git`
+<p align="center">
+  <a href="#installation">Installation</a> &nbsp;·&nbsp;
+  <a href="#usage">Usage</a> &nbsp;·&nbsp;
+  <a href="#contents">Contents</a> &nbsp;·&nbsp;
+  <a href="#supported-tools">Supported tools</a> &nbsp;·&nbsp;
+  <a href="#license">License</a>
+</p>
 
 ---
+
+This repo is a single [Agent Skills](https://agentskills.io/)-style package: a directory with **`SKILL.md`** at the root plus linked Markdown, `rules/`, and `templates/`. Install it where your tool discovers skills, or point Copilot-style assistants at the files via project instructions.
 
 ## Installation
 
@@ -34,6 +50,11 @@ After install, **reload the IDE or agent** so the skill is picked up. Run `npx s
 ---
 
 ### Alternative: `git clone` (global, one copy per machine)
+
+Use this if you prefer not to use the skills CLI. **Repository URL** (substitute your fork if needed):
+
+- SSH: `git@github.com:dmenchaca/webflow-to-react.git`
+- HTTPS: `https://github.com/dmenchaca/webflow-to-react.git`
 
 Pick **one** block for the tool you use. Each command installs the skill under that tool’s global skills directory so every project can use it.
 
