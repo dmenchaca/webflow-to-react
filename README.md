@@ -49,6 +49,9 @@ An [agent skill](https://agentskills.io/) for turning a **Webflow HTML export** 
 | [rules/](rules/) | Portable rules (optional copy into `.cursor/rules/`, etc.) |
 | [templates/](templates/) | Snippets and examples |
 
+> [!NOTE]
+> **Scope:** Static **export** pages only—not **Webflow CMS** (collections, dynamic templates). CMS content needs a separate plan.
+
 ## Installation
 
 ```bash

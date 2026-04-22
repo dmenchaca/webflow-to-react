@@ -11,7 +11,7 @@ description: >-
   self-hosting, CSS preservation, global-effect hooks, first-run GitHub +
   Netlify ship (MCP + auth fallbacks), optional Core Web Vitals patterns (font
   preload, deferred analytics, CLS tweaks; adapt per export), and GSAP kept
-  intact (not rewritten in Framer Motion).
+  intact (not rewritten in Framer Motion). Does not cover Webflow CMS (static export only).
 ---
 
 # Webflow → TanStack Start (React) migration
@@ -24,7 +24,7 @@ This skill is **not tied to a single product**. The workflow, `playbook.md`, `go
 
 **Rules (`rules/*.mdc`):** Same content works everywhere — they are Markdown with optional YAML frontmatter. Point **Cursor** at `.cursor/rules/` (see below); for **other agents**, copy the constraints into the project’s agent rules file (e.g. `AGENTS.md`, `.github/copilot-instructions.md`, or your tool’s equivalent) so fonts, GSAP, SSR, and Netlify settings stay consistent across sessions.
 
-**First-time migration ship:** If this is the **first** conversion of that site, the agent should **ship to a new private GitHub repo** (prefer **GitHub MCP** `create_repository`) and **connect Netlify** to that repo. **Mission critical:** In the Netlify dashboard **Build settings**, **every** field (**Runtime, Base directory, Package directory, Build command, Publish directory, Functions directory**) must stay **empty / Not set** so **only** repo-root **`netlify.toml`** controls the build — any filled UI field causes **real deploy failures** (404, missing SSR functions, wrong paths). See **[gotchas.md](gotchas.md) § *Mission critical: Netlify UI*** and **[shipping.md](shipping.md) §2.1**. Users may not be logged in — follow **[shipping.md](shipping.md)** for MCP failures and `gh` / dashboard fallbacks.
+**First-time migration ship:** If this is the **first** conversion of that site, the agent should **ship to a new private GitHub repo** (prefer **GitHub MCP** `create_repository`) and **connect Netlify** to that repo. **Mission critical:** In the Netlify dashboard **Build settings**, **every** field (**Runtime, Base directory, Package directory, Build command, Publish directory, Functions directory**) must stay **empty / Not set** so **only** repo-root `**netlify.toml`** controls the build — any filled UI field causes **real deploy failures** (404, missing SSR functions, wrong paths). See **[gotchas.md](gotchas.md) § *Mission critical: Netlify UI*** and **[shipping.md](shipping.md) §2.1**. Users may not be logged in — follow **[shipping.md](shipping.md)** for MCP failures and `gh` / dashboard fallbacks.
 
 ## When to use this skill
 
@@ -32,6 +32,9 @@ This skill is **not tied to a single product**. The workflow, `playbook.md`, `go
 - They want a maintainable React codebase aligned with **TanStack** (Router, optional Query/Table later).
 - They want **SSR** without bolting on a second framework.
 - They want to keep Webflow visuals and GSAP behavior.
+
+> [!NOTE]
+> **Scope:** Static **export** pages only—not **Webflow CMS** (collections, dynamic templates). CMS content needs a separate plan.
 
 ## Strict checklist (build before deploy)
 
@@ -41,10 +44,10 @@ Short prompts (e.g. “migrate to TanStack Start”) still mean: **run the build
 
 **Build phase = Quick workflow 1 → 12** (use [playbook.md](playbook.md) and [gotchas.md](gotchas.md); expand sub-steps 10/10b/10c/10d and **14** where your tool needs rules):
 
-- [ ] **Scaffold** — `web/` with TanStack Start (React + TS), Netlify Vite plugin, deps, root `package.json` proxy to `web/` when the repo is split (steps **2–5**).
-- [ ] **Assets + CSS** — public assets, compiled Webflow CSS, `site-fonts.css` first, `marketing.css` barrel, global font-smoothing, styles wired in root layout/routes (**6–10**, **10b**, **10c**).
-- [ ] **Port UI** — sections into routes/components under `web/src/` (**11**).
-- [ ] **Client-only motion** — GSAP in `useEffect` + `gsap.context` only; **remove** jQuery and **`webflow.js`** from the app path (**12**).
+- **Scaffold** — `web/` with TanStack Start (React + TS), Netlify Vite plugin, deps, root `package.json` proxy to `web/` when the repo is split (steps **2–5**).
+- **Assets + CSS** — public assets, compiled Webflow CSS, `site-fonts.css` first, `marketing.css` barrel, global font-smoothing, styles wired in root layout/routes (**6–10**, **10b**, **10c**).
+- **Port UI** — sections into routes/components under `web/src/` (**11**).
+- **Client-only motion** — GSAP in `useEffect` + `gsap.context` only; **remove** jQuery and `**webflow.js`** from the app path (**12**).
 
 **Build-done gate (minimum):** A reviewer can see `web/`, a running layout/route that matches the export for at least the first agreed slice, correct CSS order / `<head>` parity, and no client bundle dependency on jQuery or `webflow.js`. **Then** SSR smoke test (**15**) and **deploy** steps apply.
 
@@ -92,11 +95,11 @@ Copy/adapt from `templates/`. TanStack Start also generates its own `vite.config
 
 - `templates/root-package.json` — proxy scripts to `web/`
 - `templates/web-package.json` — **reference only**; prefer versions from TanStack Start + your additions
-- `templates/netlify.toml` — production CI (repo root); **`templates/web-netlify.toml`** — local `vite dev` / Netlify plugin root = `web/`
+- `templates/netlify.toml` — production CI (repo root); `**templates/web-netlify.toml`** — local `vite dev` / Netlify plugin root = `web/`
 - `templates/PlausibleLoader.tsx` (example **only if** the project uses Plausible), `templates/site-font-preload.example.ts`, `templates/performance-overrides.example.css` — optional CWV patterns (**adapt per site**)
-- `templates/vite-ssr-noexternal.example.ts` — `web/vite.config.ts` shape with the **`ssr.noExternal`** pattern + local SSR smoke test for Netlify function crashes (**per-site list**, do not paste another project's deps)
-- `templates/site-seo.example.ts` — `web/src/site/seo.ts` + reminder that **`{ title }` belongs inside `head().meta`**, not top-level `head()`
-- `templates/sitemap.xml.example`, `templates/robots.txt.example` — copy into **`web/public/`** when using static sitemap/robots ([gotchas.md](gotchas.md) § *Static sitemap.xml and robots.txt*)
+- `templates/vite-ssr-noexternal.example.ts` — `web/vite.config.ts` shape with the `**ssr.noExternal`** pattern + local SSR smoke test for Netlify function crashes (**per-site list**, do not paste another project's deps)
+- `templates/site-seo.example.ts` — `web/src/site/seo.ts` + reminder that `**{ title }` belongs inside `head().meta`**, not top-level `head()`
+- `templates/sitemap.xml.example`, `templates/robots.txt.example` — copy into `**web/public/**` when using static sitemap/robots ([gotchas.md](gotchas.md) § *Static sitemap.xml and robots.txt*)
 - `templates/site-fonts.css`, `templates/marketing.css`, `MarketingSiteRoot.tsx` — same ideas as before, paths under `web/src/`
 
 ## Rules to scaffold
