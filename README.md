@@ -59,12 +59,32 @@ Install for all projects on this machine: add `-g`. Reload your editor or agent 
 
 ## Example prompts
 
-| Step | You might say |
-|------|---------------|
-| 💭 Plan | Read [playbook.md](playbook.md) and [gotchas.md](gotchas.md) and tell me the top risks for this export—fonts, GSAP, analytics, and anything that will break SSR. |
-| 🤖 Migrate | Convert this Webflow export to TanStack Start (React, SSR) with pixel parity. Use the **webflow-to-react** skill and follow [SKILL.md](SKILL.md) from step one. |
-| 🚀 Deploy | Follow [shipping.md](shipping.md) for a new private GitHub repo and Netlify. Build settings in the Netlify UI must stay empty; only root `netlify.toml` should drive the build. |
-| 🧰 Troubleshoot | Work through [checklists/cleanup-before-done.md](checklists/cleanup-before-done.md) and [gotchas.md](gotchas.md) for CWV, `sitemap.xml` / `robots.txt` if we need them, and any Netlify function / `ssr.noExternal` issues. |
+<table>
+<thead>
+<tr>
+<th width="200">Step</th>
+<th>Prompt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>💭 Plan</td>
+<td>Using the <strong>webflow-to-react</strong> skill, read <a href="playbook.md">playbook.md</a> and <a href="gotchas.md">gotchas.md</a> and tell me the top risks for this export—fonts, GSAP, analytics, and anything that will break SSR.</td>
+</tr>
+<tr>
+<td>🤖 Migrate</td>
+<td>Convert this Webflow export to TanStack Start (React, SSR) with pixel parity. Use the <strong>webflow-to-react</strong> skill and follow <a href="SKILL.md">SKILL.md</a> from step one.</td>
+</tr>
+<tr>
+<td>🚀 Deploy</td>
+<td>Follow <a href="shipping.md">shipping.md</a> for a new private GitHub repo and Netlify. Build settings in the Netlify UI must stay empty; only root <code>netlify.toml</code> should drive the build.</td>
+</tr>
+<tr>
+<td>🧰 Troubleshoot</td>
+<td>Work through <a href="checklists/cleanup-before-done.md">checklists/cleanup-before-done.md</a> and <a href="gotchas.md">gotchas.md</a> for CWV, <code>sitemap.xml</code> / <code>robots.txt</code> if we need them, and any Netlify function / <code>ssr.noExternal</code> issues.</td>
+</tr>
+</tbody>
+</table>
 
 ## Usage
 
