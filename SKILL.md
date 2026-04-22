@@ -48,6 +48,7 @@ Migration progress:
 - [ ] 9. Write web/src/styles/marketing.css barrel in the right order
 - [ ] 10. Integrate marketing styles in TanStack root layout (__root.tsx) + routes
 - [ ] 10b. **Port the export `index.html` `<head>`** into `__root.tsx` (title, description, OG/Twitter, favicon links, theme-color, analytics/scripts if any) — TanStack Start has no static `index.html`; skipping this loses SEO and icons even when assets exist in `public/`
+- [ ] 10d. **Optional SEO — static `sitemap.xml` / `robots.txt`:** if the site needs them, add to **`web/public/`** (served at `/sitemap.xml` and `/robots.txt`; no special TanStack wiring). See [gotchas.md](gotchas.md) § *Static sitemap.xml and robots.txt* and [templates/sitemap.xml.example](templates/sitemap.xml.example) / [templates/robots.txt.example](templates/robots.txt.example). Use prerender+plugin sitemap or a server route when URL sets are large or dynamic (TanStack SEO guide)
 - [ ] 10c. **Global font-smoothing:** copy Webflow’s `* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale }` (from `css/webflow.css` / `index.html`) into the app’s global CSS (e.g. `styles.css` `@layer base`) — without it, macOS often renders text **heavier** than production (see [gotchas.md](gotchas.md) § *Copy Webflow’s global font-smoothing*)
 - [ ] 11. Port sections into routes or components under web/src/
 - [ ] 12. Keep GSAP in client-only code (useEffect + gsap.context); drop jQuery/webflow.js
@@ -78,6 +79,7 @@ Copy/adapt from `templates/`. TanStack Start also generates its own `vite.config
 - `templates/PlausibleLoader.tsx` (example **only if** the project uses Plausible), `templates/site-font-preload.example.ts`, `templates/performance-overrides.example.css` — optional CWV patterns (**adapt per site**)
 - `templates/vite-ssr-noexternal.example.ts` — `web/vite.config.ts` shape with the **`ssr.noExternal`** pattern + local SSR smoke test for Netlify function crashes (**per-site list**, do not paste another project's deps)
 - `templates/site-seo.example.ts` — `web/src/site/seo.ts` + reminder that **`{ title }` belongs inside `head().meta`**, not top-level `head()`
+- `templates/sitemap.xml.example`, `templates/robots.txt.example` — copy into **`web/public/`** when using static sitemap/robots ([gotchas.md](gotchas.md) § *Static sitemap.xml and robots.txt*)
 - `templates/site-fonts.css`, `templates/marketing.css`, `MarketingSiteRoot.tsx` — same ideas as before, paths under `web/src/`
 
 ## Rules to scaffold

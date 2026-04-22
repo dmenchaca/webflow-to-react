@@ -132,7 +132,7 @@ cp ./rules/*.mdc .cursor/rules/   # run from the webflow-to-react repo root, or 
 | `shipping.md` | First-run GitHub + Netlify |
 | `checklists/` | Pre-migration + cleanup ship gate |
 | `rules/` | Portable rules (fonts, CSS, GSAP, widgets, Netlify) |
-| `templates/` | Snippets (netlify, fonts barrel, `MarketingSiteRoot`, …) |
+| `templates/` | Snippets (netlify, fonts barrel, `MarketingSiteRoot`, static `sitemap.xml` / `robots.txt` examples, …) |
 
 ---
 

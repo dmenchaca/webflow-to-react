@@ -70,6 +70,7 @@ Do **not** declare the migration done until every item passes.
 - [ ] OG/Twitter meta tags match the original site.
 - [ ] Agreed analytics behavior matches the export + user (removed, replaced, or kept per brief); **no extra** GTM/GA/Hotjar unless requested.
 - [ ] Favicon + webclip resolve.
+- [ ] If the site should expose **`/sitemap.xml`** and **`/robots.txt`**, they exist under **`web/public/`** (served as static files — see [gotchas.md](../gotchas.md) § *Static sitemap.xml and robots.txt*). `Sitemap:` and `<loc>` entries use the **live** production origin (HTTPS), not a stale Webflow preview URL.
 
 ## Webflow interactivity audit
 

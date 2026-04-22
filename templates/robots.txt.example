@@ -1,0 +1,8 @@
+# Copy to web/public/robots.txt — served at /robots.txt
+# Replace https://www.example.com with the real production origin (HTTPS).
+# See gotchas.md § Static sitemap.xml and robots.txt
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.example.com/sitemap.xml

@@ -41,6 +41,7 @@ Complete this audit **before** writing any code. It takes ~20 minutes and saves 
 - [ ] Capture `<title>`, `<meta name="description">`, and all `og:*` / `twitter:*` tags — wire them into TanStack Start’s head API / root layout (see starter docs; avoid leaving `generator` as `Webflow`).
 - [ ] Note favicon and webclip filenames.
 - [ ] Note any JSON-LD or structured data.
+- [ ] If the **published** Webflow site (or export) has **`/sitemap.xml`** or **`/robots.txt`**, plan to recreate them: copy or rewrite into **`web/public/`** (static) or use TanStack [prerender sitemap / server routes](https://tanstack.com/start/v0/docs/framework/react/guide/seo) for dynamic lists — see [gotchas.md](../gotchas.md) § *Static sitemap.xml and robots.txt*.
 
 ## Integrations to confirm with user
 

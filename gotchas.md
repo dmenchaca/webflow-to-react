@@ -180,6 +180,16 @@ curl -sS 'https://YOUR_SITE.netlify.app/' | tr -d '\0' | grep -E '<title>|Switch
 
 Expect a real `<title>…</title>` and **no** `Switched to client rendering`. See [checklists/cleanup-before-done.md](checklists/cleanup-before-done.md) § *Post-deploy HTML verification*.
 
+### Static `sitemap.xml` and `robots.txt` in `public/` {#sitemap-robots}
+
+TanStack Start (via Vite) serves files from **`web/public/`** at the **site root**. Add **static** `sitemap.xml` and `robots.txt` by placing them in **`web/public/`** — they need no `head()` entry and no file route. After build/deploy they are available at `/sitemap.xml` and `/robots.txt`, matching the [TanStack Start SEO guide](https://tanstack.com/start/v0/docs/framework/react/guide/seo) (“drop files in public”).
+
+**When this fits:** a small, known set of URLs; parity with a Webflow publish that used plain sitemap/robots files; or a first ship before prerender-based generation.
+
+**When to use something else:** use TanStack’s **prerender** + **built-in sitemap** (crawl, `host` in the plugin) for many static pages; use a **server route** for CMS-driven or frequently changing URL lists. See the same guide’s sitemap and robots sections for those patterns.
+
+**Fixups:** in `robots.txt`, the `Sitemap:` line must use the **real production** base URL (HTTPS). In `sitemap.xml`, every `<loc>` should match the routes you actually deploy — no stale Webflow subdomains.
+
 ---
 
 ## Netlify + TanStack Start {#netlify}

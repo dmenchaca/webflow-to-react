@@ -110,6 +110,12 @@ Centralize strings in something like **`web/src/site/seo.ts`** ([templates/site-
 
 Also copy **global `*` rules** from **`css/webflow.css`** (or the `<style>` blocks in the export `index.html`) into your global stylesheet — at minimum **`-webkit-font-smoothing: antialiased`** and **`-moz-osx-font-smoothing: grayscale`**. Webflow relies on these for consistent text weight on macOS; TanStack/Tailwind shells omit them by default. See [gotchas.md](gotchas.md) § *Copy Webflow’s global font-smoothing*.
 
+### 3.6c. Optional — static `sitemap.xml` and `robots.txt`
+
+Files in **`web/public/`** are served at the site root (Vite behavior; same as the [TanStack Start SEO guide](https://tanstack.com/start/v0/docs/framework/react/guide/seo)). If the migration needs crawlers to discover URLs or a `robots.txt` policy, add **`web/public/sitemap.xml`** and/or **`web/public/robots.txt`**. They require no `head()` wiring.
+
+Use **[templates/sitemap.xml.example](templates/sitemap.xml.example)** and **[templates/robots.txt.example](templates/robots.txt.example)** as starting points; replace hostnames and paths with the **production** domain and the routes you actually ship. For many pages or build-time discovery, prefer TanStack’s **prerender** + sitemap options in the Vite plugin; for CMS-backed URLs, use a **server route** (see the guide).
+
 ### 3.7. shadcn primitives on demand
 
 ```bash
