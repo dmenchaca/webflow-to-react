@@ -33,6 +33,23 @@ This skill is **not tied to a single product**. The workflow, `playbook.md`, `go
 - They want **SSR** without bolting on a second framework.
 - They want to keep Webflow visuals and GSAP behavior.
 
+## Strict checklist (build before deploy)
+
+Short prompts (e.g. “migrate to TanStack Start”) still mean: **run the build phase in order**. Nothing here is a runtime compiler, but the agent must treat the following as **non-optional** for a real migration.
+
+**Rule:** Do **not** start **first deploy** (GitHub + Netlify, [shipping.md](shipping.md), Quick workflow **~16+**) or present a deploy as the next action until the **build phase** below is **actually present in the repo** (files on disk, not a plan). If the user asks to deploy early, **stop**, say the build phase is incomplete, and list the missing items from the Quick workflow.
+
+**Build phase = Quick workflow 1 → 12** (use [playbook.md](playbook.md) and [gotchas.md](gotchas.md); expand sub-steps 10/10b/10c/10d and **14** where your tool needs rules):
+
+- [ ] **Scaffold** — `web/` with TanStack Start (React + TS), Netlify Vite plugin, deps, root `package.json` proxy to `web/` when the repo is split (steps **2–5**).
+- [ ] **Assets + CSS** — public assets, compiled Webflow CSS, `site-fonts.css` first, `marketing.css` barrel, global font-smoothing, styles wired in root layout/routes (**6–10**, **10b**, **10c**).
+- [ ] **Port UI** — sections into routes/components under `web/src/` (**11**).
+- [ ] **Client-only motion** — GSAP in `useEffect` + `gsap.context` only; **remove** jQuery and **`webflow.js`** from the app path (**12**).
+
+**Build-done gate (minimum):** A reviewer can see `web/`, a running layout/route that matches the export for at least the first agreed slice, correct CSS order / `<head>` parity, and no client bundle dependency on jQuery or `webflow.js`. **Then** SSR smoke test (**15**) and **deploy** steps apply.
+
+**Optional / parallel:** 10d (sitemap/robots), 13/13b (analytics, CWV), 14 (agent rules) — follow Quick workflow; do not use “optional” to skip **1–12** or **10b/10c** when the user expects a faithful site.
+
 ## Quick workflow
 
 ```
