@@ -17,6 +17,7 @@
 
 <p align="center">
   <a href="#what-this-is">What this is</a> &nbsp;·&nbsp;
+  <a href="#why-migrate-from-webflow-to-react">Why migrate</a> &nbsp;·&nbsp;
   <a href="#whats-in-the-repo">What's in the repo</a> &nbsp;·&nbsp;
   <a href="#installation">Installation</a> &nbsp;·&nbsp;
   <a href="#usage">Usage</a> &nbsp;·&nbsp;
@@ -28,6 +29,12 @@
 ## What this is
 
 An [agent skill](https://agentskills.io/) for turning a **Webflow HTML export** into a **TanStack Start** app: keep CSS and layout honest, keep GSAP, ship SSR + Netlify without inventing a second stack. The workflow lives in Markdown so **Cursor, Claude Code, Copilot, Gemini CLI, Codex**, and friends can follow the same playbook.
+
+## Why migrate from Webflow to React
+
+- **Lower hosting cost:** Deploy to [Netlify](https://www.netlify.com/), [Cloudflare](https://pages.cloudflare.com/), or [Vercel](https://vercel.com/). For a typical site, their free tiers are often enough, so you are not paying Webflow to host a static or SSR marketing site.
+- **Agentic editing:** The whole app lives in Git—use agentic coding in your editor or CLI to edit your site on the order of **10x** faster than the Webflow Designer loop alone.
+- **Skills ecosystem:** Stack this skill with others—[Impeccable](https://impeccable.style/) for design polish and critique, and [Motion](https://motion.dev/) (or your Motion / animation skill of choice) to refine motion and interaction without ripping out your GSAP work.
 
 ## What's in the repo
 
