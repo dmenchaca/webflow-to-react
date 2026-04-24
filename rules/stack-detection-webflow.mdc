@@ -1,0 +1,27 @@
+---
+description: After Webflow → React migration, drop editor-only HTML fingerprints and fix generator/OG URLs so stack scanners (Wappalyzer, BuiltWith) do not falsely imply the site is still “hosted on Webflow”
+globs: "web/src/routes/__root.tsx,web/src/site/seo.ts,web/src/routes/**/*.tsx"
+alwaysApply: false
+---
+
+# Webflow stack detection (document shell)
+
+Tools like **Wappalyzer** infer technology from **HTML, URLs, and class names** — not from who actually hosts the site. After migration, the React app may still **look** like Webflow to scanners if you copy the export shell verbatim.
+
+## Do (low risk, do during root shell port)
+
+- Set **`<meta name="generator">`** to something accurate (e.g. `Vite + React + TanStack Start`), **not** `Webflow`.
+- **Omit `data-wf-page` and `data-wf-site` on `<html>`** unless something in **your** code or CSS depends on them. They are Webflow **editor / publish metadata**; exported CSS almost never selects them. Confirm with `rg 'data-wf-' web/src/styles` before deleting.
+- Prefer **absolute `og:image` / `twitter:image` URLs on the production domain** (or `/images/...` on the live origin). URLs on **`uploads-ssl.webflow.com`** are a strong third-party fingerprint.
+
+## Keep when CSS still needs it
+
+- The export’s **inline init** that adds **`w-mod-js`**, **`w-mod-touch`** (on touch devices), and **`w-mod-ix`** on `documentElement` — keep this if copied **`webflow.css`** or project CSS uses selectors like **`html.w-mod-touch`** or **`html.w-mod-js:not(.w-mod-ix) …`**. Removing it without replacing those rules breaks layout or IX fallbacks.
+- **`w-*` classes** (`w-embed`, `w-nav`, …) on body markup — required for **visual parity** with compiled Webflow CSS. Many scanners will still mention Webflow; that is expected until a later markup/CSS refactor.
+
+## Expectations
+
+- **Pixel-parity migrations** intentionally ship Webflow-shaped CSS and classes. Some tools will still report “Webflow” even when the app is **TanStack + Netlify**. That is **not** the same as the site being published from Webflow Hosting.
+- Full removal of Webflow signals requires **rehosting assets**, **renaming classes**, and **replacing or pruning `webflow.css`** — out of scope for day-one parity; treat as a follow-up project.
+
+See **[gotchas.md](../gotchas.md) § Stack detection (Wappalyzer, BuiltWith)**.

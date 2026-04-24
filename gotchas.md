@@ -397,15 +397,35 @@ Default dev port is 5173 (Vite's default; `vite.config.ts` does not override). I
 
 ---
 
-## Stack detection (Wappalyzer, BuiltWith)
+## Stack detection (Wappalyzer, BuiltWith) {#stack-detection}
+
+Browser extensions and “tech stack” sites **pattern-match** the HTML/CSS/URLs you ship. They **do not** prove the site is still **published from Webflow Hosting**. After a TanStack migration, **Netlify (or another host) serves the app** — but leftover export fingerprints make scanners say “Webflow” anyway.
 
 ### Update the `generator` meta tag
 
-Webflow exports include `<meta name="generator" content="Webflow">`. After migration, change it to something accurate (e.g. `TanStack Start + React` or `Vite + React`). Wappalyzer and BuiltWith will otherwise keep reporting "Webflow."
+Webflow exports include `<meta name="generator" content="Webflow">`. After migration, set it to something accurate (e.g. `Vite + React + TanStack Start`). If you leave `Webflow`, Wappalyzer / BuiltWith will keep reporting it.
+
+### Drop `data-wf-page` and `data-wf-site` from `<html>` (default)
+
+The export puts **`data-wf-page`** and **`data-wf-site`** on `<html>`. Those IDs are for **Webflow’s editor and publish pipeline**, not for your React runtime. **`grep` / `rg` your copied marketing CSS** — if nothing matches `data-wf-`, **remove both attributes** from the root shell (e.g. `web/src/routes/__root.tsx`). This removes a **high-confidence** detector signal without affecting layout.
+
+### Keep the `w-mod-*` document classes when CSS needs them
+
+Exports often include an **inline script** (or the same logic) that appends **`w-mod-js`**, **`w-mod-touch`** (touch devices), and **`w-mod-ix`** to `document.documentElement.className`. **Do not delete this** just to appease scanners if **`webflow.css`** or bundled site CSS still contains selectors like **`html.w-mod-touch *`** or **`html.w-mod-js:not(.w-mod-ix) [data-w-id="…"]`**. Those rules control initial visibility and touch behavior; removing the classes without refactoring CSS causes **visual regressions**.
+
+### `w-*` classes, `w-embed`, and bundled `webflow.css`
+
+Preserving **pixel parity** means keeping **Webflow class names** and **`webflow.css`**. Detectors may still flag “Webflow” from **class prefixes**, **stylesheet content**, or **`.w-webflow-badge`** rules inside copied CSS. That is **expected** until you intentionally refactor markup/CSS.
+
+### Social images still on `uploads-ssl.webflow.com`
+
+If **`og:image`** / **`twitter:image`** point at **Webflow’s asset CDN**, scanners (and humans) still see a Webflow URL. **Download the file into `web/public/images/`** (or your CDN) and point meta tags at **`https://your-production-domain/...`** so previews and fingerprints align with your stack.
 
 ### Prerendering hides React from detectors
 
-If you add SSR/SSG later, detection tools infer the stack from the rendered HTML and may miss React entirely. That's fine for users; just know detectors' limits.
+If you add SSR/SSG, tools infer the stack from rendered HTML and may miss React. That is fine; detector output is heuristic.
+
+**Rule file:** [rules/stack-detection-webflow.mdc](rules/stack-detection-webflow.mdc).
 
 ---
 

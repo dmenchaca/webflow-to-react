@@ -116,6 +116,14 @@ Files in **`web/public/`** are served at the site root (Vite behavior; same as t
 
 Use **[templates/sitemap.xml.example](templates/sitemap.xml.example)** and **[templates/robots.txt.example](templates/robots.txt.example)** as starting points; replace hostnames and paths with the **production** domain and the routes you actually ship. For many pages or build-time discovery, prefer TanStack’s **prerender** + sitemap options in the Vite plugin; for CMS-backed URLs, use a **server route** (see the guide).
 
+### 3.6d. Document shell — stack scanners (Wappalyzer, BuiltWith)
+
+When porting the export into **`__root.tsx`**, do **not** blindly copy **`data-wf-page`** / **`data-wf-site`** on `<html>`. Confirm with a repo search that **no** `data-wf-` selectors exist in **`web/src/styles`**; then **omit** those attributes — they are editor metadata and trigger false “Webflow” hits in stack detectors.
+
+**Do** keep the **`w-mod-js` / `w-mod-touch` / `w-mod-ix`** bootstrap (inline script or equivalent) if **`webflow.css`** or bundled CSS still targets **`html.w-mod-*`**. **Do** set **`generator`** meta to the real stack and move **OG/Twitter images** off **`uploads-ssl.webflow.com`** when you want social previews and URLs to match your domain.
+
+See [gotchas.md](gotchas.md) § *Stack detection* and [rules/stack-detection-webflow.mdc](rules/stack-detection-webflow.mdc).
+
 ### 3.7. shadcn primitives on demand
 
 ```bash

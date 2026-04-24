@@ -10,8 +10,10 @@ description: >-
   Codex, or any agent that loads Markdown skills. Covers folder layout, font
   self-hosting, CSS preservation, global-effect hooks, first-run GitHub +
   Netlify ship (MCP + auth fallbacks), optional Core Web Vitals patterns (font
-  preload, deferred analytics, CLS tweaks; adapt per export), and GSAP kept
-  intact (not rewritten in Framer Motion). Does not cover Webflow CMS (static export only).
+  preload, deferred analytics, CLS tweaks; adapt per export), GSAP kept
+  intact (not rewritten in Framer Motion), and document-shell cleanup so
+  stack scanners do not see useless Webflow fingerprints (data-wf-*, generator).
+  Does not cover Webflow CMS (static export only).
 ---
 
 # Webflow → TanStack Start (React) migration
@@ -42,10 +44,10 @@ Short prompts (e.g. “migrate to TanStack Start”) still mean: **run the build
 
 **Rule:** Do **not** start **first deploy** (GitHub + Netlify, [shipping.md](shipping.md), Quick workflow **~16+**) or present a deploy as the next action until the **build phase** below is **actually present in the repo** (files on disk, not a plan). If the user asks to deploy early, **stop**, say the build phase is incomplete, and list the missing items from the Quick workflow.
 
-**Build phase = Quick workflow 1 → 12** (use [playbook.md](playbook.md) and [gotchas.md](gotchas.md); expand sub-steps 10/10b/10c/10d and **14** where your tool needs rules):
+**Build phase = Quick workflow 1 → 12** (use [playbook.md](playbook.md) and [gotchas.md](gotchas.md); expand sub-steps 10/10b/10c/10d/10e and **14** where your tool needs rules):
 
 - **Scaffold** — `web/` with TanStack Start (React + TS), Netlify Vite plugin, deps, root `package.json` proxy to `web/` when the repo is split (steps **2–5**).
-- **Assets + CSS** — public assets, compiled Webflow CSS, `site-fonts.css` first, `marketing.css` barrel, global font-smoothing, styles wired in root layout/routes (**6–10**, **10b**, **10c**).
+- **Assets + CSS** — public assets, compiled Webflow CSS, `site-fonts.css` first, `marketing.css` barrel, global font-smoothing, document-shell fingerprint cleanup, styles wired in root layout/routes (**6–10**, **10b**, **10c**, **10e**).
 - **Port UI** — sections into routes/components under `web/src/` (**11**).
 - **Client-only motion** — GSAP in `useEffect` + `gsap.context` only; **remove** jQuery and `**webflow.js`** from the app path (**12**).
 
@@ -70,6 +72,7 @@ Migration progress:
 - [ ] 10b. **Port the export `index.html` `<head>`** into `__root.tsx` (title, description, OG/Twitter, favicon links, theme-color, analytics/scripts if any) — TanStack Start has no static `index.html`; skipping this loses SEO and icons even when assets exist in `public/`
 - [ ] 10d. **Optional SEO — static `sitemap.xml` / `robots.txt`:** if the site needs them, add to **`web/public/`** (served at `/sitemap.xml` and `/robots.txt`; no special TanStack wiring). See [gotchas.md](gotchas.md) § *Static sitemap.xml and robots.txt* and [templates/sitemap.xml.example](templates/sitemap.xml.example) / [templates/robots.txt.example](templates/robots.txt.example). Use prerender+plugin sitemap or a server route when URL sets are large or dynamic (TanStack SEO guide)
 - [ ] 10c. **Global font-smoothing:** copy Webflow’s `* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale }` (from `css/webflow.css` / `index.html`) into the app’s global CSS (e.g. `styles.css` `@layer base`) — without it, macOS often renders text **heavier** than production (see [gotchas.md](gotchas.md) § *Copy Webflow’s global font-smoothing*)
+- [ ] 10e. **Document shell vs stack scanners:** remove **`data-wf-page` / `data-wf-site`** from `<html>` when CSS does not reference them; set **`generator`** meta to the real stack; prefer **self-hosted or production-domain** OG/Twitter image URLs over **`uploads-ssl.webflow.com`**. **Keep** the **`w-mod-js` / `w-mod-touch` / `w-mod-ix`** init script when copied CSS still uses `html.w-mod-*` selectors (see [gotchas.md](gotchas.md) § *Stack detection* and [rules/stack-detection-webflow.mdc](rules/stack-detection-webflow.mdc)).
 - [ ] 11. Port sections into routes or components under web/src/
 - [ ] 12. Keep GSAP in client-only code (useEffect + gsap.context); drop jQuery/webflow.js
 - [ ] 13. Analytics: follow the **export + user** (remove/replace GTM/GA/Hotjar per agreement — not every site uses Plausible; see [gotchas.md](gotchas.md)); set generator meta in HTML shell
@@ -85,7 +88,7 @@ Migration progress:
 
 1. **[playbook.md](playbook.md)** — bootstrap order, TanStack Start layout, CSS, components.
 2. **[shipping.md](shipping.md)** — **first-run** GitHub (MCP) + Netlify + **unauthenticated** fallbacks.
-3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, **Netlify + TanStack deploy (`[build] base`, `web/netlify.toml`, UI overrides)**, **Core Web Vitals**, GSAP, iframes.
+3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, **Netlify + TanStack deploy (`[build] base`, `web/netlify.toml`, UI overrides)**, **Core Web Vitals**, GSAP, iframes, **stack detection / Wappalyzer fingerprints**.
 4. **[checklists/pre-migration.md](checklists/pre-migration.md)**
 5. **[checklists/cleanup-before-done.md](checklists/cleanup-before-done.md)**
 
@@ -111,7 +114,7 @@ mkdir -p .cursor/rules
 cp ./rules/*.mdc .cursor/rules/   # from this skill repo root; or ~/.cursor/skills/webflow-to-react/rules/ if installed globally
 ```
 
-**Other agents:** Copy or adapt the same files into your tool’s project instructions, or symlink this repo’s `rules/` into a path your assistant loads. Files: `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`, `ssr-noexternal-netlify.mdc`, `performance-cwv.mdc`
+**Other agents:** Copy or adapt the same files into your tool’s project instructions, or symlink this repo’s `rules/` into a path your assistant loads. Files: `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`, `ssr-noexternal-netlify.mdc`, `performance-cwv.mdc`, `stack-detection-webflow.mdc`
 
 ## Tech stack (default)
 

@@ -67,6 +67,8 @@ Do **not** declare the migration done until every item passes.
 - [ ] Root HTML shell (TanStack Start entry / route head) has the right `<title>` and description — values from **[templates/site-seo.example.ts](../templates/site-seo.example.ts)** / `web/src/site/seo.ts`.
 - [ ] **`head()` includes `{ title: siteSeo.title }` inside the `meta` array** (not a top-level `title` key — that produces **no** `<title>` in SSR HTML). See [gotchas.md](../gotchas.md) § *The export’s `<head>`*.
 - [ ] `<meta name="generator">` is **not** `Webflow` — use something accurate (`TanStack Start`, `Vite + React`, etc.).
+- [ ] Root `<html>` has **no** `data-wf-page` / `data-wf-site` unless something in **`web/src/styles`** genuinely depends on them (verify with `rg 'data-wf-' web/src/styles` — empty output → safe to omit).
+- [ ] OG/Twitter image URLs: prefer **production origin** or **`/images/...` on the live site**, not stale **`uploads-ssl.webflow.com`** links, unless you explicitly keep Webflow CDN assets.
 - [ ] OG/Twitter meta tags match the original site.
 - [ ] Agreed analytics behavior matches the export + user (removed, replaced, or kept per brief); **no extra** GTM/GA/Hotjar unless requested.
 - [ ] Favicon + webclip resolve.
