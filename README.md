@@ -1,8 +1,8 @@
 # webflow-to-react
 
-[License: MIT](LICENSE)
-[GitHub stars](https://github.com/dmenchaca/webflow-to-react/stargazers)
-[Last commit](https://github.com/dmenchaca/webflow-to-react/commits/main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/dmenchaca/webflow-to-react?style=flat&color=blue)](https://github.com/dmenchaca/webflow-to-react/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/dmenchaca/webflow-to-react)](https://github.com/dmenchaca/webflow-to-react/commits/main)
 
 An [agent skill](https://agentskills.io/) for turning a **Webflow HTML export** into a **React app** using TanStack Start and Netlify for hosting. 
 
