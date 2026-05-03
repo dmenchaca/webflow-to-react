@@ -1,99 +1,42 @@
-<p align="center">
-  <img src="https://em-content.zobj.net/source/apple/391/rocket_1f680.png" width="96" alt="" />
-</p>
+# webflow-to-react
 
-<h1 align="center">webflow-to-react</h1>
+[License: MIT](LICENSE)
+[GitHub stars](https://github.com/dmenchaca/webflow-to-react/stargazers)
+[Last commit](https://github.com/dmenchaca/webflow-to-react/commits/main)
 
-<p align="center">
-  <strong>Webflow export → TanStack Start (React + SSR)</strong><br />
-  <em>Playbook, checklists, rules, and templates for pixel-parity migrations</em>
-</p>
+An [agent skill](https://agentskills.io/) for turning a **Webflow HTML export** into a **React app** using TanStack Start and Netlify for hosting. 
 
-<p align="center">
-  <a href="https://github.com/dmenchaca/webflow-to-react/stargazers"><img src="https://img.shields.io/github/stars/dmenchaca/webflow-to-react?style=flat&color=yellow" alt="Stars" /></a>
-  <a href="https://github.com/dmenchaca/webflow-to-react/commits/main"><img src="https://img.shields.io/github/last-commit/dmenchaca/webflow-to-react?style=flat" alt="Last commit" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/dmenchaca/webflow-to-react?style=flat" alt="License" /></a>
-</p>
+This skill keeps CSS and layout intact to ensure a pixel perfect conversion. 
 
-<p align="center">
-  <a href="#what-this-is">What this is</a> &nbsp;·&nbsp;
-  <a href="#why-migrate-from-webflow-to-react">Why migrate</a> &nbsp;·&nbsp;
-  <a href="#whats-in-the-repo">What's in the repo</a> &nbsp;·&nbsp;
-  <a href="#installation">Installation</a> &nbsp;·&nbsp;
-  <a href="#example-prompts">Example prompts</a> &nbsp;·&nbsp;
-  <a href="#usage">Usage</a> &nbsp;·&nbsp;
-  <a href="#license">License</a>
-</p>
+Webflow CMS template pages are converted but the skill **does not handle CMS**. To switch out of Webflow CMS you will need a headless CMS like Sanity, Astro, etc.
 
----
+## Quick Start
 
-## What this is
+1. **Export site from Webflow**
+  Go to Webflow and export site. You will get .zip file.
+2. **Install skill**
+  ```markdown
+   npx skills@latest add dmenchaca/webflow-to-react -y
+  ```
+   Install for all projects on this machine: add `-g`. Reload your editor or agent after install.
+3. **Upload exported .zip Cursor, Claude or your agent of choice**
+  ```markdown
+   Convert this Webflow export to TanStack Start (React, SSR) with pixel parity. Use the webflow-to-re
+  act skill and follow SKILL.md from step one.
+  ```
 
-An [agent skill](https://agentskills.io/) for turning a **Webflow HTML export** into a **TanStack Start** app: keep CSS and layout honest, keep GSAP, ship SSR + Netlify without inventing a second stack. The workflow lives in Markdown so **Cursor, Claude Code, Copilot, Gemini CLI, Codex**, etc. can follow the same playbook.
+## Deploying site
 
-## Why migrate from Webflow to React
+The skill is optimized for Netlify and supports server-side rendering (SSR) out of the box. 
+To deploy simply push your site to Github and connect Github with Netlify.
 
-- **Lower cost:** Deploy to [Netlify](https://www.netlify.com/), [Cloudflare](https://pages.cloudflare.com/), or [Vercel](https://vercel.com/). Their free tiers are often more enough.
-- **Build faster:** Use Cursor, Claude, Antigravity or your agent of choice to edit your site at blazing speed.
-- **Skills ecosystem:** Stack this skill with others like [Impeccable](https://impeccable.style/) for design polish and critique, and [Motion](https://motion.dev/) (or your Motion / animation skill of choice) to refine motion and interactions.
+## Troubeshooting
 
-## What's in the repo
+If you run into issues with the deploy or SSR run this prompt:
 
-| Item | What |
-|------|------|
-| [SKILL.md](SKILL.md) | When to use it, end-to-end checklist, where things live |
-| [playbook.md](playbook.md) | Bootstrap order, app layout, CSS strategy |
-| [gotchas.md](gotchas.md) | Fonts, SSR vs client, Netlify, GSAP, meta |
-| [shipping.md](shipping.md) | First-run GitHub + Netlify |
-| [checklists/](checklists/) | Pre-migration + before “done” |
-| [rules/](rules/) | Portable rules (optional copy into `.cursor/rules/`, etc.) |
-| [templates/](templates/) | Snippets and examples |
-
-> [!NOTE]
-> **Scope:** Static **export** pages only—not **Webflow CMS** (collections, dynamic templates). CMS content needs a separate plan.
-
-## Installation
-
-```bash
-npx skills@latest add dmenchaca/webflow-to-react -y
+```markdown
+Work through checklists/cleanup-before-done.md and gotchas.md for CWV, sitemap.xml / robots.txt if we need them, and any Netlify function / ssr.noExternal issues.
 ```
-
-Install for all projects on this machine: add `-g`. Reload your editor or agent after install.
-
-## Example prompts
-
-<table>
-<thead>
-<tr>
-<th width="200">Step</th>
-<th>Prompt</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>💭 Plan</td>
-<td>Using the <strong>webflow-to-react</strong> skill, read <a href="playbook.md">playbook.md</a> and <a href="gotchas.md">gotchas.md</a> and tell me the top risks for this export—fonts, GSAP, analytics, and anything that will break SSR.</td>
-</tr>
-<tr>
-<td>🤖 Migrate</td>
-<td>Convert this Webflow export to TanStack Start (React, SSR) with pixel parity. Use the <strong>webflow-to-react</strong> skill and follow <a href="SKILL.md">SKILL.md</a> from step one.</td>
-</tr>
-<tr>
-<td>🚀 Deploy</td>
-<td>Follow <a href="shipping.md">shipping.md</a> for a new private GitHub repo and Netlify. Build settings in the Netlify UI must stay empty; only root <code>netlify.toml</code> should drive the build.</td>
-</tr>
-<tr>
-<td>🧰 Troubleshoot</td>
-<td>Work through <a href="checklists/cleanup-before-done.md">checklists/cleanup-before-done.md</a> and <a href="gotchas.md">gotchas.md</a> for CWV, <code>sitemap.xml</code> / <code>robots.txt</code> if we need them, and any Netlify function / <code>ssr.noExternal</code> issues.</td>
-</tr>
-</tbody>
-</table>
-
-## Usage
-
-1. Open **[SKILL.md](SKILL.md)**, then **[playbook.md](playbook.md)** when you start a migration.  
-2. Use **[shipping.md](shipping.md)** before first deploy, **[gotchas.md](gotchas.md)** when something looks wrong.  
-3. In the IDE, **@-mention** the skill or `SKILL.md` if your product supports it.
 
 ## Supported tools
 
@@ -102,7 +45,7 @@ Install for all projects on this machine: add `-g`. Reload your editor or agent 
 - [GitHub Copilot](https://code.visualstudio.com/docs/copilot)
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 - [Codex CLI](https://developers.openai.com/codex/)
-- …and other agents that load [`SKILL.md`](SKILL.md) as a skill (see the [skills](https://github.com/vercel-labs/skills) CLI).
+- …and other agents that load `[SKILL.md](SKILL.md)` as a skill (see the [skills](https://github.com/vercel-labs/skills) CLI).
 
 ## License
 

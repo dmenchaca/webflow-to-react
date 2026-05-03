@@ -1,2 +1,5 @@
 .DS_Store
 *.log
+
+# Local README HTML previews (e.g. npx marked -o …)
+*readme-preview*.html
