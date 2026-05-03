@@ -13,16 +13,18 @@ Webflow CMS template pages are converted but the skill **does not handle CMS**. 
 ## Quick Start
 
 1. **Export site from Webflow**
-  Go to Webflow and export site. You will get .zip file.
-2. **Install skill**
+<br>Go to Webflow to export your site. You will get .zip file.
+
+2. **Install skill on Cursor, Claude, etc.**
   ```markdown
    npx skills@latest add dmenchaca/webflow-to-react -y
   ```
    Install for all projects on this machine: add `-g`. Reload your editor or agent after install.
-3. **Upload exported .zip Cursor, Claude or your agent of choice**
+
+3. **Upload exported .zip to agent and prompt:**
   ```markdown
-   Convert this Webflow export to TanStack Start (React, SSR) with pixel parity. Use the webflow-to-re
-  act skill and follow SKILL.md from step one.
+   Convert this Webflow export to TanStack Start (React, SSR) with pixel parity. 
+   Use the webflow-to-react skill and follow SKILL.md from step one.
   ```
 
 ## Deploying site
