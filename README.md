@@ -6,7 +6,7 @@
 
 An [agent skill](https://agentskills.io/) for turning a **Webflow HTML export** into a **React app** using TanStack Start and Netlify for hosting. 
 
-This skill keeps CSS and layout intact to ensure a pixel perfect conversion. 
+This skill keeps CSS and layout intact to ensure a **pixel perfect conversion**. 
 
 Webflow CMS template pages are converted but the skill **does not handle CMS**. To switch out of Webflow CMS you will need a headless CMS like Sanity, Astro, etc.
 
