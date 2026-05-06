@@ -5,6 +5,7 @@ Do **not** declare the migration done until every item passes.
 ## Build & lint
 
 - [ ] `npm run build` at the repo root completes successfully (proxies into `web/`).
+- [ ] **`npm ci` in `web/`** succeeds from a clean tree (`rm -rf web/node_modules && cd web && npm ci`) whenever **`web/package.json`** or **`web/package-lock.json`** changed — Netlify uses **`npm ci`** when the lockfile exists; skipping this causes **`EUSAGE`** / **`ETARGET`** surprises on deploy. See [gotchas.md](../gotchas.md) § *npm ci, lockfiles, and `"latest"`*, [shipping.md](../shipping.md) § *Lockfile and CI parity*.
 - [ ] `npm run lint` passes with no errors.
 - [ ] `npm run dev` and production preview: page matches the original Webflow site (visual spot-check).
 

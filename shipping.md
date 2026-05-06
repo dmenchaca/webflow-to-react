@@ -14,6 +14,20 @@ Agents should follow this doc whenever the user asks to “ship”, “push to G
 
 ---
 
+## Lockfile and CI parity (before push)
+
+Netlify (and most CI) runs **`npm ci`** in **`web/`** when **`web/package-lock.json`** exists. Treat **`npm ci` + lockfile committed** as part of “ship-ready”, not optional hygiene.
+
+1. After **any** dependency change in **`web/package.json`**, run **`npm install`** in **`web/`**, then verify **`npm ci`** succeeds from a clean tree:
+   ```bash
+   cd web && rm -rf node_modules && npm ci && npm run build
+   ```
+2. **Commit `web/package-lock.json`** together with **`web/package.json`** changes.
+3. For **production** deploys, **avoid `"latest"`** on **`@tanstack/*`** and other core packages — pin **exact versions** (or tight ranges you control) so the install tree stops drifting every fresh install. See **[gotchas.md](gotchas.md) § *npm ci, lockfiles, and `"latest"`***.
+4. If a **transitive** package repeatedly breaks CI (`ETARGET`, peer conflicts), use **`package.json` `overrides`** sparingly and document the reason (same gotchas section).
+
+---
+
 ## 1. GitHub — create repo and push
 
 ### 1.1 Prefer MCP (Cursor GitHub integration)

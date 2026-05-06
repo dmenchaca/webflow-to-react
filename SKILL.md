@@ -44,16 +44,17 @@ Short prompts (e.g. “migrate to TanStack Start”) still mean: **run the build
 
 **Rule:** Do **not** start **first deploy** (GitHub + Netlify, [shipping.md](shipping.md), Quick workflow **~16+**) or present a deploy as the next action until the **build phase** below is **actually present in the repo** (files on disk, not a plan). If the user asks to deploy early, **stop**, say the build phase is incomplete, and list the missing items from the Quick workflow.
 
-**Build phase = Quick workflow 1 → 12** (use [playbook.md](playbook.md) and [gotchas.md](gotchas.md); expand sub-steps 10/10b/10c/10d/10e and **14** where your tool needs rules):
+**Build phase = Quick workflow 1 → 12b** (use [playbook.md](playbook.md) and [gotchas.md](gotchas.md); expand sub-steps 10/10b/10c/10d/10e and **14** where your tool needs rules):
 
 - **Scaffold** — `web/` with TanStack Start (React + TS), Netlify Vite plugin, deps, root `package.json` proxy to `web/` when the repo is split (steps **2–5**).
 - **Assets + CSS** — public assets, compiled Webflow CSS, `site-fonts.css` first, `marketing.css` barrel, global font-smoothing, document-shell fingerprint cleanup, styles wired in root layout/routes (**6–10**, **10b**, **10c**, **10e**).
 - **Port UI** — sections into routes/components under `web/src/` (**11**).
 - **Client-only motion** — GSAP in `useEffect` + `gsap.context` only; **remove** jQuery and `**webflow.js`** from the app path (**12**).
+- **Lockfile / CI** — `npm ci` passes in **`web/`** with a committed **`package-lock.json`**; pin **`@tanstack/*`** for production deploys instead of **`latest`** where possible (**12b** — [gotchas.md](gotchas.md) § *npm ci, lockfiles, and `"latest"`*, [shipping.md](shipping.md) § *Lockfile and CI parity*).
 
 **Build-done gate (minimum):** A reviewer can see `web/`, a running layout/route that matches the export for at least the first agreed slice, correct CSS order / `<head>` parity, and no client bundle dependency on jQuery or `webflow.js`. **Then** SSR smoke test (**15**) and **deploy** steps apply.
 
-**Optional / parallel:** 10d (sitemap/robots), 13/13b (analytics, CWV), 14 (agent rules) — follow Quick workflow; do not use “optional” to skip **1–12** or **10b/10c** when the user expects a faithful site.
+**Optional / parallel:** 10d (sitemap/robots), 13/13b (analytics, CWV), 14 (agent rules) — follow Quick workflow; do not use “optional” to skip **1–12b** or **10b/10c** when the user expects a faithful site.
 
 ## Quick workflow
 
@@ -75,6 +76,7 @@ Migration progress:
 - [ ] 10e. **Document shell vs stack scanners:** remove **`data-wf-page` / `data-wf-site`** from `<html>` when CSS does not reference them; set **`generator`** meta to the real stack; prefer **self-hosted or production-domain** OG/Twitter image URLs over **`uploads-ssl.webflow.com`**. **Keep** the **`w-mod-js` / `w-mod-touch` / `w-mod-ix`** init script when copied CSS still uses `html.w-mod-*` selectors (see [gotchas.md](gotchas.md) § *Stack detection* and [rules/stack-detection-webflow.mdc](rules/stack-detection-webflow.mdc)).
 - [ ] 11. Port sections into routes or components under web/src/
 - [ ] 12. Keep GSAP in client-only code (useEffect + gsap.context); drop jQuery/webflow.js
+- [ ] 12b. **Lockfile + `npm ci`:** after dependency changes, `cd web && npm install`, then **`npm ci` must pass** from a clean **`node_modules`**; commit **`web/package-lock.json`**. Prefer **pinned** `@tanstack/*` versions over **`latest`** for deploy repos ([gotchas.md](gotchas.md) § *npm ci, lockfiles, and `"latest"`*, [shipping.md](shipping.md) § *Lockfile and CI parity*).
 - [ ] 13. Analytics: follow the **export + user** (remove/replace GTM/GA/Hotjar per agreement — not every site uses Plausible; see [gotchas.md](gotchas.md)); set generator meta in HTML shell
 - [ ] 13b. **Optional CWV:** `web/netlify.toml` from [templates/web-netlify.toml](templates/web-netlify.toml); font preloads / deferred third-party scripts / hero image priorities per [gotchas.md](gotchas.md) § Core Web Vitals
 - [ ] 14. Scaffold agent rules from `rules/` into the project (`.cursor/rules/` for Cursor, or merge into AGENTS.md / Copilot instructions / your tool’s rules — see *Coding agents and IDEs* above)
@@ -88,7 +90,7 @@ Migration progress:
 
 1. **[playbook.md](playbook.md)** — bootstrap order, TanStack Start layout, CSS, components.
 2. **[shipping.md](shipping.md)** — **first-run** GitHub (MCP) + Netlify + **unauthenticated** fallbacks.
-3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, **Netlify + TanStack deploy (`[build] base`, `web/netlify.toml`, UI overrides)**, **Core Web Vitals**, GSAP, iframes, **stack detection / Wappalyzer fingerprints**.
+3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, **`npm ci` / lockfiles / pinning `latest`** (§ *npm ci, lockfiles, and `"latest"`*), **Netlify + TanStack deploy (`[build] base`, `web/netlify.toml`, UI overrides)**, **Core Web Vitals**, GSAP, iframes, **stack detection / Wappalyzer fingerprints**.
 4. **[checklists/pre-migration.md](checklists/pre-migration.md)**
 5. **[checklists/cleanup-before-done.md](checklists/cleanup-before-done.md)**
 
@@ -114,7 +116,7 @@ mkdir -p .cursor/rules
 cp ./rules/*.mdc .cursor/rules/   # from this skill repo root; or ~/.cursor/skills/webflow-to-react/rules/ if installed globally
 ```
 
-**Other agents:** Copy or adapt the same files into your tool’s project instructions, or symlink this repo’s `rules/` into a path your assistant loads. Files: `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`, `ssr-noexternal-netlify.mdc`, `performance-cwv.mdc`, `stack-detection-webflow.mdc`
+**Other agents:** Copy or adapt the same files into your tool’s project instructions, or symlink this repo’s `rules/` into a path your assistant loads. Files: `webflow-css-preservation.mdc`, `self-hosted-fonts-vite.mdc`, `gsap-in-react.mdc`, `marketing-global-effects.mdc`, `widget-iframe-overlay.mdc`, `netlify-tanstack-deploy.mdc`, `npm-ci-reproducibility.mdc`, `ssr-noexternal-netlify.mdc`, `performance-cwv.mdc`, `stack-detection-webflow.mdc`
 
 ## Tech stack (default)
 

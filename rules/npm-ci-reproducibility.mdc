@@ -1,0 +1,21 @@
+---
+description: npm ci + lockfile parity in web/ — Netlify and CI install from package-lock.json; sync lockfile after dependency edits; pin @tanstack/* instead of latest for shipped repos; optional overrides for flaky transitives
+globs: "web/package.json,**/package-lock.json"
+alwaysApply: false
+---
+
+# npm ci and reproducible installs (`web/`)
+
+Netlify (and most CI) runs **`npm ci`** in **`web/`** when **`web/package-lock.json`** exists. **`npm ci`** installs **exactly** what the lockfile pins — not “whatever `npm install` resolves today”.
+
+## Rules
+
+1. After **any** change to **`web/package.json`** or intentional dependency bump: run **`npm install`** inside **`web/`**, then verify **`npm ci`** from a clean tree:
+   ```bash
+   cd web && rm -rf node_modules && npm ci && npm run build
+   ```
+2. **Commit `web/package-lock.json`** in the **same** commit as **`web/package.json`** changes.
+3. For repos that **deploy**, prefer **exact versions** (or tight ranges you control) on **`@tanstack/*`** and other core deps — avoid **`"latest"`** so installs stop drifting between laptops and CI.
+4. **`ETARGET` / lock failures on CI:** regenerate the lockfile locally after **`npm install`**; if a **transitive** stays broken, add a documented **`package.json` `overrides`** entry as a last resort.
+
+Full context: **[gotchas.md](../gotchas.md) § *npm ci, lockfiles, and `"latest"`***, **[shipping.md](../shipping.md) § *Lockfile and CI parity***.

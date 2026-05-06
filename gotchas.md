@@ -53,6 +53,39 @@ TanStack Start + Tailwind entry CSS **does not** include this by default. If you
 
 ---
 
+## npm ci, lockfiles, and `"latest"` {#npm-ci}
+
+TanStack Start scaffolds often ship **`"latest"`** on **`@tanstack/*`** (and similar). That is fine for local spikes; it is **brittle** for repos that deploy with **`npm ci`**.
+
+### Why Netlify / CI breaks while your laptop “works”
+
+- **`npm ci`** installs **exactly** from **`package-lock.json`**. If **`package.json` and the lockfile are out of sync** (or the lockfile is incomplete), **`npm ci` fails** with `EUSAGE` / “lock file's … does not satisfy …”.
+- A fresh **`npm install`** can **bump transitives** every run when ranges float (`latest`, wide carets). The tree drifts; **`npm ci`** on a clean CI runner then disagrees with what you last committed.
+- **`ETARGET` / “No matching version found for `<pkg>@<x.y.z>`”** during Netlify’s **Install dependencies** step often means the lockfile asked for a tarball the runner could not resolve the same way (new release, registry edge, or a bad/partial lock entry). **Regenerate the lockfile** and prefer **pinned** app deps.
+
+### Required workflow before every push (especially first deploy)
+
+From **`web/`**:
+
+```bash
+cd web
+rm -rf node_modules
+npm install    # refreshes package-lock.json when package.json or the tree changed
+npm ci         # must pass — same command Netlify uses when a lockfile exists
+npm run build
+```
+
+Then **commit `web/package-lock.json`** with the same commit as any **`package.json`** change.
+
+### Production recommendation (repos you ship)
+
+- **Pin `@tanstack/*` and other core deps** to **exact versions** (or tight ranges you intentionally bump), not **`latest`**, so CI stops reshuffling every week.
+- **Optional `package.json` `overrides`**: last resort when a **flaky transitive** (real examples: **`jiti`**, **`crossws`**, registry **`ETARGET`**) breaks **`npm ci`**. Document why each override exists — remove when upstream resolves.
+
+See **[shipping.md](shipping.md) § Lockfile and CI parity** and **[checklists/cleanup-before-done.md](checklists/cleanup-before-done.md)**.
+
+---
+
 ## SSR (TanStack Start) {#ssr}
 
 ### Browser-only code must not run on the server
