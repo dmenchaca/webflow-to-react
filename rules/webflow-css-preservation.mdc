@@ -12,6 +12,7 @@ This project migrated from a Webflow HTML export. The fastest path to pixel pari
 
 - Put Webflow class names on JSX verbatim (`className="hero-section_wrapper"`, underscores and all).
 - Keep the compiled Webflow CSS split under `src/styles/marketing/` (`normalize.css`, `layout-components.css`, `<brand>.css`, etc.).
+- **`marketing.css` `@import` order:** **`site-fonts.css` first**, then normalize/layout/**compiled `<brand>.webflow.css`**, then any **`global-embed.css`** (or similar) copied from **`index.html`** `<style>` blocks. Embeds usually define **`.hide`** and must load **after** the site bundle — otherwise hidden Designer nodes become visible. See **[gotchas.md](../gotchas.md) § *Designer-hidden nodes: `.hide` and stylesheet order***.
 - Rewrite asset URLs in copied CSS to root-relative: `url("/images/...")`, `url("/fonts/...")`.
 - When in doubt, diff against the root-level `index.html` (Webflow reference — read-only).
 

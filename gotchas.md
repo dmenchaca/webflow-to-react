@@ -53,6 +53,26 @@ TanStack Start + Tailwind entry CSS **does not** include this by default. If you
 
 ---
 
+## Designer-hidden nodes: `.hide` and stylesheet order {#hide-css-order}
+
+Exports often keep **`hide`** / **`w-hidden`** on nodes that are hidden in **Designer** so JSX stays a verbatim structural match. Those nodes stay **invisible in Webflow** because cascade wins — not because React removes them.
+
+Typical export shape:
+
+1. **`*.webflow.css`** (compiled site bundle) linked in **`<head>`**.
+2. A **`<style>` embed** later (often in **`body`**) with global utilities such as **`.hide { display: none !important }`**.
+
+If you lift that embed into something like **`global-embed.css`** but **`@import` it before** the compiled **`*.webflow.css`** in **`marketing.css`**, later site rules can override **`.hide`**. Buttons and sections that should stay hidden show up as normal flex children — easy to mistake for a missing class on JSX when it is **pure cascade order**.
+
+**Fix:**
+
+- Match **Webflow’s effective sheet order** in **`marketing.css`**: **`site-fonts.css`** first (see § Fonts), then **`normalize` / layout / `<brand>.webflow.css`**, then any **`global-embed.css`** (or equivalent) extracted from **`index.html`** `<style>` blocks — **after** the site bundle.
+- Spot-check in DevTools → **Computed** on a node that still carries **`hide`**: **`display`** should be **`none`** after production build.
+
+There is no reliable automated lint for this; order + a manual check after **`npm run build`** is the guardrail.
+
+---
+
 ## npm ci, lockfiles, and `"latest"` {#npm-ci}
 
 TanStack Start scaffolds often ship **`"latest"`** on **`@tanstack/*`** (and similar). That is fine for local spikes; it is **brittle** for repos that deploy with **`npm ci`**.

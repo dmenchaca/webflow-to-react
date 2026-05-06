@@ -68,7 +68,7 @@ Migration progress:
 - [ ] 6. Move assets → web/public/{images,fonts}/ (rewrite URLs to /)
 - [ ] 7. Copy compiled Webflow CSS → web/src/styles/marketing/
 - [ ] 8. Write web/src/styles/site-fonts.css (@font-face FIRST)
-- [ ] 9. Write web/src/styles/marketing.css barrel in the right order
+- [ ] 9. Write web/src/styles/marketing.css barrel in the right order (fonts first; compiled **`*.webflow.css` before** body-embed / **`global-embed.css`** so **`.hide`** wins — [gotchas.md](gotchas.md) § *Designer-hidden nodes: `.hide` and stylesheet order*)
 - [ ] 10. Integrate marketing styles in TanStack root layout (__root.tsx) + routes
 - [ ] 10b. **Port the export `index.html` `<head>`** into `__root.tsx` (title, description, OG/Twitter, favicon links, theme-color, analytics/scripts if any) — TanStack Start has no static `index.html`; skipping this loses SEO and icons even when assets exist in `public/`
 - [ ] 10d. **Optional SEO — static `sitemap.xml` / `robots.txt`:** if the site needs them, add to **`web/public/`** (served at `/sitemap.xml` and `/robots.txt`; no special TanStack wiring). See [gotchas.md](gotchas.md) § *Static sitemap.xml and robots.txt* and [templates/sitemap.xml.example](templates/sitemap.xml.example) / [templates/robots.txt.example](templates/robots.txt.example). Use prerender+plugin sitemap or a server route when URL sets are large or dynamic (TanStack SEO guide)
@@ -90,7 +90,7 @@ Migration progress:
 
 1. **[playbook.md](playbook.md)** — bootstrap order, TanStack Start layout, CSS, components.
 2. **[shipping.md](shipping.md)** — **first-run** GitHub (MCP) + Netlify + **unauthenticated** fallbacks.
-3. **[gotchas.md](gotchas.md)** — fonts, SSR vs client-only hooks, **`npm ci` / lockfiles / pinning `latest`** (§ *npm ci, lockfiles, and `"latest"`*), **Netlify + TanStack deploy (`[build] base`, `web/netlify.toml`, UI overrides)**, **Core Web Vitals**, GSAP, iframes, **stack detection / Wappalyzer fingerprints**.
+3. **[gotchas.md](gotchas.md)** — fonts, **`.hide` / CSS barrel order** (§ *Designer-hidden nodes*), SSR vs client-only hooks, **`npm ci` / lockfiles / pinning `latest`** (§ *npm ci, lockfiles, and `"latest"`*), **Netlify + TanStack deploy (`[build] base`, `web/netlify.toml`, UI overrides)**, **Core Web Vitals**, GSAP, iframes, **stack detection / Wappalyzer fingerprints**.
 4. **[checklists/pre-migration.md](checklists/pre-migration.md)**
 5. **[checklists/cleanup-before-done.md](checklists/cleanup-before-done.md)**
 

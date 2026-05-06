@@ -8,6 +8,7 @@ Do **not** declare the migration done until every item passes.
 - [ ] **`npm ci` in `web/`** succeeds from a clean tree (`rm -rf web/node_modules && cd web && npm ci`) whenever **`web/package.json`** or **`web/package-lock.json`** changed — Netlify uses **`npm ci`** when the lockfile exists; skipping this causes **`EUSAGE`** / **`ETARGET`** surprises on deploy. See [gotchas.md](../gotchas.md) § *npm ci, lockfiles, and `"latest"`*, [shipping.md](../shipping.md) § *Lockfile and CI parity*.
 - [ ] `npm run lint` passes with no errors.
 - [ ] `npm run dev` and production preview: page matches the original Webflow site (visual spot-check).
+- [ ] **`.hide` / hidden chrome:** if the export uses **`hide`** (or **`w-hidden`**) on nodes that must stay invisible, verify **Computed → `display: none`** after build — reversed **`marketing.css`** order (embed before site bundle) shows them by mistake ([gotchas.md](../gotchas.md) § *Designer-hidden nodes: `.hide` and stylesheet order*).
 
 ## TanStack Start / output path
 

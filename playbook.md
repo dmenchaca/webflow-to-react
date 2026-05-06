@@ -144,6 +144,8 @@ See [gotchas.md § Fonts](gotchas.md#fonts).
 
 Same **verbatim Webflow CSS** strategy as before. Barrel `marketing.css` with **`@import "./site-fonts.css"` first**.
 
+**Load order vs Webflow:** If **`index.html`** ships **`*.webflow.css` in `<head>`** and then **`<style>` utilities** in **`body`** (often **`.hide { display: none !important }`**), preserve that sequence in the barrel: put **`global-embed.css`** (or whatever holds those extracts) **after** the compiled **`*.webflow.css`** imports — **not** before. Reversed order makes **`hide`** nodes visible. See [gotchas.md](gotchas.md) § *Designer-hidden nodes: `.hide` and stylesheet order*.
+
 Import the marketing barrel in the **root layout** (`__root.tsx`) so SSR includes styles:
 
 ```tsx

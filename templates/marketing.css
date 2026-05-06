@@ -1,6 +1,10 @@
 /* Marketing site: global layout + design tokens.
- * IMPORT ORDER IS LOAD-BEARING. Fonts first or they won't register
- * before rules that reference them are parsed. */
+ * IMPORT ORDER IS LOAD-BEARING:
+ * - Fonts first (before rules that reference families).
+ * - Compiled *.webflow.css BEFORE global-embed.css / body <style> extracts —
+ *   embeds often define .hide { display: none !important }; loading them first
+ *   lets later site CSS override .hide (broken parity).
+ */
 @import "./site-fonts.css";
 @import "./marketing/normalize.css";
 @import "./marketing/layout-components.css";

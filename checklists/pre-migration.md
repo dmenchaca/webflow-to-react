@@ -5,7 +5,7 @@ Complete this audit **before** writing any code. It takes ~20 minutes and saves 
 ## Inventory the export
 
 - [ ] Open `index.html` and list every top-level `<section>` (or equivalent wrapper). Each becomes a section component under `web/src/components/...` and is composed from the home route (`web/src/routes/index.tsx` or equivalent).
-- [ ] Compare **live** Webflow (or published site) to the ZIP: elements hidden in Designer may be missing `w-hidden` / `hide` in the export — flag for manual class parity.
+- [ ] Compare **live** Webflow (or published site) to the ZIP: elements hidden in Designer may be missing `w-hidden` / `hide` in the export — flag for manual class parity. After wiring **`marketing.css`**, confirm **`.hide`** still wins if those classes exist ([gotchas.md](../gotchas.md) § *Designer-hidden nodes: `.hide` and stylesheet order*).
 - [ ] Note any sections you will drop (`display: none` in export only) — skip unless the user wants them.
 - [ ] List all HTML pages present (`index.html`, `style-guide.html`, `401.html`, `404.html`, CMS templates). Confirm which are in scope.
 
