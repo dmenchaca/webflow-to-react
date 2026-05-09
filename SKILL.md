@@ -2,7 +2,8 @@
 name: webflow-to-react
 description: >-
   Converts a Webflow HTML export into a maintainable React app with TanStack Start
-  (SSR, TanStack Router conventions) and pixel parity on day one. Use when the
+  (SSR, TanStack Router conventions) using an idiomatic React-first approach.
+  Use when the
   user has a Webflow export (index.html + css/ + js/ + images/ + fonts/) and
   wants to migrate to React, when they mention TanStack Start, TanStack Router,
   SSR, "convert Webflow to React", or when a repo already contains a Webflow
@@ -16,9 +17,18 @@ description: >-
   Does not cover Webflow CMS (static export only).
 ---
 
-# Webflow → TanStack Start (React) migration
+# Webflow → TanStack Start (React) migration (idiomatic-first)
 
-Turns a Webflow HTML export into a **TanStack Start** app (SSR + file-based routing via TanStack Router) with **pixel parity from day one**, then progressive refactors. Strategy: **copy CSS verbatim, wrap HTML in JSX, keep GSAP in client boundaries, replace jQuery/webflow.js with hooks**.
+Turns a Webflow HTML export into a **TanStack Start** app (SSR + file-based routing via TanStack Router) using an **idiomatic React-first** strategy.
+
+**Default posture (mission critical):**
+
+- Prefer **JSX components** over importing/exporting raw HTML.
+- Prefer Webflow export as **reference + CSS/class heritage**, not the page runtime.
+- Avoid `dangerouslySetInnerHTML` for page layout. Only allow it for **small, sanitized, content-shaped** fragments (e.g. CMS body HTML) when explicitly chosen.
+- Avoid re-executing `<script>` tags from injected HTML. Re-implement behavior as hooks/components instead.
+
+> If you want “pixel parity fast” by embedding exported Webflow body HTML and replaying scripts, this skill should not do that unless the user explicitly opts into a parity-first mode.
 
 ### Coding agents and IDEs
 
@@ -38,6 +48,13 @@ This skill is **not tied to a single product**. The workflow, `playbook.md`, `go
 > [!NOTE]
 > **Scope:** Static **export** pages only—not **Webflow CMS** (collections, dynamic templates). CMS content needs a separate plan.
 
+## Non-negotiables (idiomatic-first)
+
+- **No HTML-host pages:** Do not build routes by importing `*.html` / `*.body.html` blobs and injecting them into the DOM for “full page” rendering.
+- **No `WebflowBody` shim:** Do not create a component that injects exported HTML then re-runs `<script>` tags to approximate Webflow runtime.
+- **No jQuery / `webflow.js`** in the app runtime.
+- **No in-markup third-party scripts** inside components or raw HTML. Centralize analytics/pixels in the document shell (head/body) only when the user requests them.
+
 ## Strict checklist (build before deploy)
 
 Short prompts (e.g. “migrate to TanStack Start”) still mean: **run the build phase in order**. Nothing here is a runtime compiler, but the agent must treat the following as **non-optional** for a real migration.
@@ -48,7 +65,7 @@ Short prompts (e.g. “migrate to TanStack Start”) still mean: **run the build
 
 - **Scaffold** — `web/` with TanStack Start (React + TS), Netlify Vite plugin, deps, root `package.json` proxy to `web/` when the repo is split (steps **2–5**).
 - **Assets + CSS** — public assets, compiled Webflow CSS, `site-fonts.css` first, `marketing.css` barrel, global font-smoothing, document-shell fingerprint cleanup, styles wired in root layout/routes (**6–10**, **10b**, **10c**, **10e**).
-- **Port UI** — sections into routes/components under `web/src/` (**11**).
+- **Port UI** — rebuild pages/sections as JSX into routes/components under `web/src/` (**11**). Keep the export open as a *reference*.
 - **Client-only motion** — GSAP in `useEffect` + `gsap.context` only; **remove** jQuery and `**webflow.js`** from the app path (**12**).
 - **Lockfile / CI** — `npm ci` passes in **`web/`** with a committed **`package-lock.json`**; pin **`@tanstack/*`** for production deploys instead of **`latest`** where possible (**12b** — [gotchas.md](gotchas.md) § *npm ci, lockfiles, and `"latest"`*, [shipping.md](shipping.md) § *Lockfile and CI parity*).
 
@@ -137,6 +154,15 @@ cp ./rules/*.mdc .cursor/rules/   # from this skill repo root; or ~/.cursor/skil
 - Run a full CMS migration from Webflow CMS (stop and ask).
 - Rebuild Webflow Interactions 2.0 keyframe-for-keyframe (re-implement only what matters).
 - Store Netlify/GitHub **secrets** in-repo or bypass OAuth with embedded tokens.
+
+## Parity-first mode (explicit opt-in only)
+
+If the user explicitly requests “pixel parity first” and accepts the trade-offs, you may temporarily:
+
+- Import a narrow HTML fragment (not an entire page shell) and render it with `dangerouslySetInnerHTML`.
+- Replay **only** the minimal inline script necessary for parity, and immediately track it as debt to remove.
+
+You must label this as a **temporary shim**, avoid spreading it across routes, and plan the removal path section-by-section.
 
 ## Hand-off
 
